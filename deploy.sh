@@ -6,6 +6,37 @@
 # Exit on error
 set -e
 
+# Check if Docker Compose is installed
+check_docker_compose() {
+    # Check for docker-compose command (older versions)
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE="docker-compose"
+        return 0
+    fi
+    
+    # Check for docker compose command (newer versions)
+    if docker compose version &> /dev/null; then
+        DOCKER_COMPOSE="docker compose"
+        return 0
+    fi
+    
+    echo "Error: Docker Compose not found."
+    echo "Please install Docker Compose using one of the following methods:"
+    echo ""
+    echo "For Ubuntu/Debian:"
+    echo "  sudo apt update"
+    echo "  sudo apt install docker-compose-plugin"
+    echo ""
+    echo "For newer Docker versions:"
+    echo "  The compose plugin should be included with Docker Desktop or Docker Engine."
+    echo ""
+    echo "For manual installation:"
+    echo "  sudo curl -L \"https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose"
+    echo "  sudo chmod +x /usr/local/bin/docker-compose"
+    echo ""
+    return 1
+}
+
 # Display help message
 show_help() {
     echo "MibiTech Deployment Script"
@@ -25,16 +56,19 @@ show_help() {
 
 # Build Docker images
 build_images() {
+    # Check if Docker Compose is installed
+    check_docker_compose || return 1
+    
     echo "Building Docker images..."
     if [ "$1" == "frontend" ]; then
-        docker-compose build frontend
+        $DOCKER_COMPOSE build frontend
     elif [ "$1" == "backend" ]; then
-        docker-compose build backend
+        $DOCKER_COMPOSE build backend
     elif [ "$1" == "traefik" ]; then
-        docker-compose build traefik
+        $DOCKER_COMPOSE build traefik
     elif [ "$1" == "nginx" ]; then
         echo "Warning: Nginx is deprecated, using Traefik instead"
-        docker-compose build nginx
+        $DOCKER_COMPOSE build nginx
     else
         docker-compose build
     fi
@@ -43,16 +77,19 @@ build_images() {
 
 # Start containers
 start_containers() {
+    # Check if Docker Compose is installed
+    check_docker_compose || return 1
+    
     echo "Starting containers..."
     if [ "$1" == "frontend" ]; then
-        docker-compose up -d frontend
+        $DOCKER_COMPOSE up -d frontend
     elif [ "$1" == "backend" ]; then
-        docker-compose up -d backend
+        $DOCKER_COMPOSE up -d backend
     elif [ "$1" == "traefik" ]; then
-        docker-compose up -d traefik
+        $DOCKER_COMPOSE up -d traefik
     elif [ "$1" == "nginx" ]; then
         echo "Warning: Nginx is deprecated, using Traefik instead"
-        docker-compose up -d nginx
+        $DOCKER_COMPOSE up -d nginx
     else
         docker-compose up -d
     fi
@@ -61,20 +98,23 @@ start_containers() {
 
 # Stop containers
 stop_containers() {
+    # Check if Docker Compose is installed
+    check_docker_compose || return 1
+    
     echo "Stopping containers..."
     if [ "$1" == "frontend" ]; then
-        docker-compose stop frontend
-        docker-compose rm -f frontend
+        $DOCKER_COMPOSE stop frontend
+        $DOCKER_COMPOSE rm -f frontend
     elif [ "$1" == "backend" ]; then
-        docker-compose stop backend
-        docker-compose rm -f backend
+        $DOCKER_COMPOSE stop backend
+        $DOCKER_COMPOSE rm -f backend
     elif [ "$1" == "traefik" ]; then
-        docker-compose stop traefik
-        docker-compose rm -f traefik
+        $DOCKER_COMPOSE stop traefik
+        $DOCKER_COMPOSE rm -f traefik
     elif [ "$1" == "nginx" ]; then
         echo "Warning: Nginx is deprecated, using Traefik instead"
-        docker-compose stop nginx
-        docker-compose rm -f nginx
+        $DOCKER_COMPOSE stop nginx
+        $DOCKER_COMPOSE rm -f nginx
     else
         docker-compose down
     fi
@@ -83,16 +123,19 @@ stop_containers() {
 
 # Restart containers
 restart_containers() {
+    # Check if Docker Compose is installed
+    check_docker_compose || return 1
+    
     echo "Restarting containers..."
     if [ "$1" == "frontend" ]; then
-        docker-compose restart frontend
+        $DOCKER_COMPOSE restart frontend
     elif [ "$1" == "backend" ]; then
-        docker-compose restart backend
+        $DOCKER_COMPOSE restart backend
     elif [ "$1" == "traefik" ]; then
-        docker-compose restart traefik
+        $DOCKER_COMPOSE restart traefik
     elif [ "$1" == "nginx" ]; then
         echo "Warning: Nginx is deprecated, using Traefik instead"
-        docker-compose restart nginx
+        $DOCKER_COMPOSE restart nginx
     else
         docker-compose restart
     fi
@@ -101,16 +144,19 @@ restart_containers() {
 
 # View logs
 view_logs() {
+    # Check if Docker Compose is installed
+    check_docker_compose || return 1
+    
     echo "Viewing logs..."
     if [ "$1" == "frontend" ]; then
-        docker-compose logs -f frontend
+        $DOCKER_COMPOSE logs -f frontend
     elif [ "$1" == "backend" ]; then
-        docker-compose logs -f backend
+        $DOCKER_COMPOSE logs -f backend
     elif [ "$1" == "traefik" ]; then
-        docker-compose logs -f traefik
+        $DOCKER_COMPOSE logs -f traefik
     elif [ "$1" == "nginx" ]; then
         echo "Warning: Nginx is deprecated, using Traefik instead"
-        docker-compose logs -f nginx
+        $DOCKER_COMPOSE logs -f nginx
     else
         docker-compose logs -f
     fi
