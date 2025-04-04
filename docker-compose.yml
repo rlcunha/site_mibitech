@@ -6,7 +6,7 @@ version: '3.7'
 services:
   # Não precisamos definir o Traefik aqui, pois já está rodando no servidor
 
-  mibitech-backend:
+  backend:
     build: ./backend
     image: mibitech-backend:latest
     volumes:
@@ -32,16 +32,16 @@ services:
         - "traefik.http.services.mibitech_backend.loadbalancer.server.port=8000"
         - "traefik.http.services.mibitech_backend.loadbalancer.passHostHeader=true"
 
-  mibitech-frontend:
+  frontend:
     build: ./frontend
     image: mibitech-frontend:latest
     volumes:
       - mibitech_frontend_data:/app
       - /app/node_modules
     depends_on:
-      - mibitech-backend
+      - backend
     environment:
-      - API_URL=http://mibitech-backend:8000
+      - API_URL=http://backend:8000
       - VIRTUAL_HOST=site.mibitech.com.br
     networks:
       - network_public
@@ -61,7 +61,7 @@ services:
         - "traefik.http.routers.mibitech_frontend.priority=1"
 
   # Adicionar o serviço Nginx para servir conteúdo estático
-  mibitech-nginx:
+  nginx:
     build:
       context: ./nginx
       args:
@@ -74,8 +74,8 @@ services:
     networks:
       - network_public
     depends_on:
-      - mibitech-backend
-      - mibitech-frontend
+      - backend
+      - frontend
     deploy:
       mode: replicated
       replicas: 1
