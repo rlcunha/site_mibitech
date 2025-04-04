@@ -1,7 +1,7 @@
 version: '3.7'
 
-# Use um nome de projeto específico para evitar conflitos
-name: mibitech
+# A propriedade 'name' não é suportada em todas as versões do Docker Compose
+# Remova-a e use o nome do diretório ou especifique-o no comando: docker-compose -p mibitech up
 
 services:
   # Não precisamos definir o Traefik aqui, pois já está rodando no servidor
