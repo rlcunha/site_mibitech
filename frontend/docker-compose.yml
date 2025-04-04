@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: mibitech-frontend:latest
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mibitech-frontend.rule=Host(`appteste.mibitech.com.br`)"
+        - "traefik.http.routers.mibitech-frontend.entrypoints=websecure"
+        - "traefik.http.routers.mibitech-frontend.tls.certresolver=myresolver"
+        - "traefik.http.services.mibitech-frontend.loadbalancer.server.port=3000"
+    networks:
+      - network_public
+
+networks:
+  network_public:
+    external: true
