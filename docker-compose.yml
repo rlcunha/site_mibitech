@@ -62,7 +62,11 @@ services:
 
   # Adicionar o serviço Nginx para servir conteúdo estático
   mibitech-nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+      args:
+        # Change this value to force rebuild
+        CACHEBUST: "2"
     image: mibitech_nginx:latest
     volumes:
       - mibitech_nginx_data:/var/log/nginx
