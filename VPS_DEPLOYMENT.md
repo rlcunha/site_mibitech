@@ -126,7 +126,7 @@ Create a directory for the application and clone the repository:
 ```bash
 mkdir -p /var/www
 cd /var/www
-git clone https://github.com/yourusername/mibitech.git
+mkdir -p /var/www
 cd mibitech
 ```
 

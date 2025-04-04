@@ -99,7 +99,7 @@ mibitech/
 
 1. Clone the repository on your VPS:
    ```bash
-   git clone https://github.com/yourusername/mibitech.git
+   git clone https://github.com/rlcunha/mibitech.git
    cd mibitech
    ```
 
