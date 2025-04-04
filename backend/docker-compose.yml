@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:Mfcd62!!@postgres_postgres.1.119d9fy8yefz26a2uh6vx7xr9:5432/mibitech
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!@postgres:5432/mibitech
     networks:
       - network_public
     volumes:
