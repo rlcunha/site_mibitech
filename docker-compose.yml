@@ -10,13 +10,14 @@ services:
     build: ./backend
     image: mibitech-backend:latest
     volumes:
-      - ./backend:/app
-      - backend_static:/app/static
+      - mibitech_backend_data:/app
+      - mibitech_backend_static:/app/static
     networks:
       - network_public
     environment:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1,backend,site.mibitech.com.br
+      - VIRTUAL_HOST=site.mibitech.com.br
     deploy:
       mode: replicated
       replicas: 1
@@ -35,12 +36,13 @@ services:
     build: ./frontend
     image: mibitech-frontend:latest
     volumes:
-      - ./frontend:/app
+      - mibitech_frontend_data:/app
       - /app/node_modules
     depends_on:
       - backend
     environment:
       - API_URL=http://backend:8000
+      - VIRTUAL_HOST=site.mibitech.com.br
     networks:
       - network_public
     deploy:
@@ -58,8 +60,44 @@ services:
         - "traefik.http.services.mibitech_frontend.loadbalancer.passHostHeader=true"
         - "traefik.http.routers.mibitech_frontend.priority=1"
 
-# Configuração para Docker Swarm
-# Para implantar: docker stack deploy -c docker-compose.yml mibitech
+  # Adicionar o serviço Nginx para servir conteúdo estático
+  nginx:
+    build: ./nginx
+    image: mibitech_nginx:latest
+    volumes:
+      - mibitech_nginx_data:/var/log/nginx
+      - mibitech_backend_static:/static
+    networks:
+      - network_public
+    depends_on:
+      - backend
+      - frontend
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mibitech_nginx.rule=Host(`static.mibitech.com.br`)"
+        - "traefik.http.routers.mibitech_nginx.entrypoints=websecure"
+        - "traefik.http.routers.mibitech_nginx.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.mibitech_nginx.loadbalancer.server.port=80"
+        - "traefik.http.services.mibitech_nginx.loadbalancer.passHostHeader=true"
+
+volumes:
+  mibitech_backend_data:
+    external: true
+    name: mibitech_backend_data
+  mibitech_frontend_data:
+    external: true
+    name: mibitech_frontend_data
+  mibitech_nginx_data:
+    external: true
+    name: mibitech_nginx_data
+  mibitech_backend_static:
+    external: true
     name: mibitech_backend_static
 
 networks:
@@ -67,5 +105,5 @@ networks:
     external: true
     name: network_public
 
-volumes:
-  backend_static:
+# Configuração para Docker Swarm
+# Para implantar: docker stack deploy -c docker-compose.yml mibitech
