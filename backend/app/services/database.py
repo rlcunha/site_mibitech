@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/mibitech")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Mfcd62!!@postgres_postgres.1.119d9fy8yefz26a2uh6vx7xr9:5432/mibitech")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
