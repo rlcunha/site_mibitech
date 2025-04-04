@@ -19,7 +19,8 @@ show_help() {
     echo "  -l, --logs       View logs from all containers"
     echo "  --frontend       Only affect frontend container"
     echo "  --backend        Only affect backend container"
-    echo "  --nginx          Only affect nginx container"
+    echo "  --traefik        Only affect traefik container"
+    echo "  --nginx          Only affect nginx container (deprecated)"
 }
 
 # Build Docker images
@@ -29,7 +30,10 @@ build_images() {
         docker-compose build frontend
     elif [ "$1" == "backend" ]; then
         docker-compose build backend
+    elif [ "$1" == "traefik" ]; then
+        docker-compose build traefik
     elif [ "$1" == "nginx" ]; then
+        echo "Warning: Nginx is deprecated, using Traefik instead"
         docker-compose build nginx
     else
         docker-compose build
@@ -44,7 +48,10 @@ start_containers() {
         docker-compose up -d frontend
     elif [ "$1" == "backend" ]; then
         docker-compose up -d backend
+    elif [ "$1" == "traefik" ]; then
+        docker-compose up -d traefik
     elif [ "$1" == "nginx" ]; then
+        echo "Warning: Nginx is deprecated, using Traefik instead"
         docker-compose up -d nginx
     else
         docker-compose up -d
@@ -61,7 +68,11 @@ stop_containers() {
     elif [ "$1" == "backend" ]; then
         docker-compose stop backend
         docker-compose rm -f backend
+    elif [ "$1" == "traefik" ]; then
+        docker-compose stop traefik
+        docker-compose rm -f traefik
     elif [ "$1" == "nginx" ]; then
+        echo "Warning: Nginx is deprecated, using Traefik instead"
         docker-compose stop nginx
         docker-compose rm -f nginx
     else
@@ -77,7 +88,10 @@ restart_containers() {
         docker-compose restart frontend
     elif [ "$1" == "backend" ]; then
         docker-compose restart backend
+    elif [ "$1" == "traefik" ]; then
+        docker-compose restart traefik
     elif [ "$1" == "nginx" ]; then
+        echo "Warning: Nginx is deprecated, using Traefik instead"
         docker-compose restart nginx
     else
         docker-compose restart
@@ -92,7 +106,10 @@ view_logs() {
         docker-compose logs -f frontend
     elif [ "$1" == "backend" ]; then
         docker-compose logs -f backend
+    elif [ "$1" == "traefik" ]; then
+        docker-compose logs -f traefik
     elif [ "$1" == "nginx" ]; then
+        echo "Warning: Nginx is deprecated, using Traefik instead"
         docker-compose logs -f nginx
     else
         docker-compose logs -f
@@ -134,7 +151,11 @@ while [ $# -gt 0 ]; do
         --backend)
             SERVICE="backend"
             ;;
+        --traefik)
+            SERVICE="traefik"
+            ;;
         --nginx)
+            echo "Warning: Nginx is deprecated, using Traefik instead"
             SERVICE="nginx"
             ;;
         *)

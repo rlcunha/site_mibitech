@@ -18,7 +18,8 @@ if "%~1"=="" (
     echo   -l, --logs       View logs from all containers
     echo   --frontend       Only affect frontend container
     echo   --backend        Only affect backend container
-    echo   --nginx          Only affect nginx container
+    echo   --traefik        Only affect traefik container
+    echo   --nginx          Only affect nginx container (deprecated)
     exit /b 0
 )
 
@@ -42,7 +43,13 @@ if "%~1"=="--backend" (
     shift
     goto :parse_args
 )
+if "%~1"=="--traefik" (
+    set SERVICE=traefik
+    shift
+    goto :parse_args
+)
 if "%~1"=="--nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     set SERVICE=nginx
     shift
     goto :parse_args
@@ -117,7 +124,10 @@ if "%~1"=="frontend" (
     docker-compose build frontend
 ) else if "%~1"=="backend" (
     docker-compose build backend
+) else if "%~1"=="traefik" (
+    docker-compose build traefik
 ) else if "%~1"=="nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     docker-compose build nginx
 ) else (
     docker-compose build
@@ -132,7 +142,10 @@ if "%~1"=="frontend" (
     docker-compose up -d frontend
 ) else if "%~1"=="backend" (
     docker-compose up -d backend
+) else if "%~1"=="traefik" (
+    docker-compose up -d traefik
 ) else if "%~1"=="nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     docker-compose up -d nginx
 ) else (
     docker-compose up -d
@@ -149,7 +162,11 @@ if "%~1"=="frontend" (
 ) else if "%~1"=="backend" (
     docker-compose stop backend
     docker-compose rm -f backend
+) else if "%~1"=="traefik" (
+    docker-compose stop traefik
+    docker-compose rm -f traefik
 ) else if "%~1"=="nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     docker-compose stop nginx
     docker-compose rm -f nginx
 ) else (
@@ -165,7 +182,10 @@ if "%~1"=="frontend" (
     docker-compose restart frontend
 ) else if "%~1"=="backend" (
     docker-compose restart backend
+) else if "%~1"=="traefik" (
+    docker-compose restart traefik
 ) else if "%~1"=="nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     docker-compose restart nginx
 ) else (
     docker-compose restart
@@ -180,7 +200,10 @@ if "%~1"=="frontend" (
     docker-compose logs -f frontend
 ) else if "%~1"=="backend" (
     docker-compose logs -f backend
+) else if "%~1"=="traefik" (
+    docker-compose logs -f traefik
 ) else if "%~1"=="nginx" (
+    echo Warning: Nginx is deprecated, using Traefik instead
     docker-compose logs -f nginx
 ) else (
     docker-compose logs -f
