@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!@postgres:5432/mibitech
+    networks:
+      - network_public
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+
+networks:
+  network_public:
+    external: true
