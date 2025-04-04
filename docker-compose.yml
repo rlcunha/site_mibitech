@@ -66,7 +66,7 @@ services:
       context: ./nginx
       args:
         # Change this value to force rebuild
-        CACHEBUST: "5"
+        CACHEBUST: "6"
     image: mibitech_nginx:latest
     volumes:
       - mibitech_nginx_data:/var/log/nginx

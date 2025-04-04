@@ -16,7 +16,7 @@ RUN mkdir -p /static
 # Verify the configuration
 RUN echo "Verifying nginx configuration with upstream django and frontend"
 RUN cat /etc/nginx/conf.d/django.conf
-RUN nginx -t || echo "Configuration test failed but continuing build"
+RUN nginx -t
 
 EXPOSE 80
 
