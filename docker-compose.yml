@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: mibitech-backend
+    restart: always
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/static
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    networks:
+      - mibitech-network
+
+  frontend:
+    build: ./frontend
+    container_name: mibitech-frontend
+    restart: always
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - API_URL=http://backend:8000
+    networks:
+      - mibitech-network
+
+  nginx:
+    build: ./nginx
+    container_name: mibitech-nginx
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - backend_static:/static
+    networks:
+      - mibitech-network
+
+networks:
+  mibitech-network:
+    driver: bridge
+
+volumes:
+  backend_static:

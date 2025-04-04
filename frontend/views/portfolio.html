@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio - MibiTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="app">
+        <!-- Header Section -->
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <img src="../public/images/logo.svg" alt="MibiTech Logo" class="h-12 w-auto mr-3">
+                        <h1 class="text-2xl font-bold text-blue-600">MibiTech</h1>
+                    </div>
+                    <nav class="w-full md:w-auto">
+                        <ul class="flex flex-wrap justify-center space-x-1 md:space-x-6">
+                            <li><a href="index.html" class="px-3 py-2 text-gray-600 font-medium hover:text-blue-600 hover:border-b-2 hover:border-blue-600">Home</a></li>
+                            <li><a href="sobre.html" class="px-3 py-2 text-gray-600 font-medium hover:text-blue-600 hover:border-b-2 hover:border-blue-600">Sobre Nós</a></li>
+                            <li><a href="portfolio.html" class="px-3 py-2 text-blue-600 font-medium hover:text-blue-800 border-b-2 border-blue-600">Portfólio</a></li>
+                            <li><a href="blog.html" class="px-3 py-2 text-gray-600 font-medium hover:text-blue-600 hover:border-b-2 hover:border-blue-600">Blog</a></li>
+                            <li><a href="contato.html" class="px-3 py-2 text-gray-600 font-medium hover:text-blue-600 hover:border-b-2 hover:border-blue-600">Contato</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Title -->
+        <section class="bg-gradient-to-r from-blue-600 to-indigo-800 text-white py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl font-bold mb-4">Nosso Portfólio</h1>
+                <p class="text-xl max-w-3xl mx-auto">Conheça alguns dos projetos que desenvolvemos para nossos clientes.</p>
+            </div>
+        </section>
+
+        <!-- Portfolio Filter -->
+        <section class="py-8 bg-white border-b">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="filter-btn active px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition duration-300" data-filter="all">Todos</button>
+                    <button class="filter-btn px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-300" data-filter="web">Web</button>
+                    <button class="filter-btn px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-300" data-filter="mobile">Mobile</button>
+                    <button class="filter-btn px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-300" data-filter="desktop">Desktop</button>
+                    <button class="filter-btn px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-300" data-filter="cloud">Cloud</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Grid -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="portfolio-grid">
+                    <!-- Project 1 -->
+                    <div class="portfolio-item web" data-category="web">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-1.jpg" alt="E-commerce Website" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">E-commerce Premium</h3>
+                                <p class="text-gray-600 mb-4">Plataforma completa de e-commerce com integração de pagamentos, gestão de estoque e painel administrativo personalizado.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">React</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Node.js</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">MongoDB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="portfolio-item mobile" data-category="mobile">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-2.jpg" alt="Aplicativo de Delivery" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">FastFood Delivery</h3>
+                                <p class="text-gray-600 mb-4">Aplicativo de delivery para restaurantes com rastreamento em tempo real, pagamento in-app e sistema de avaliação.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Flutter</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Firebase</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Google Maps API</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 3 -->
+                    <div class="portfolio-item desktop" data-category="desktop">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-3.jpg" alt="Sistema de Gestão" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">ERP Empresarial</h3>
+                                <p class="text-gray-600 mb-4">Sistema completo de gestão empresarial com módulos de finanças, RH, vendas, compras e relatórios avançados.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">C#</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">.NET</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">SQL Server</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 4 -->
+                    <div class="portfolio-item cloud" data-category="cloud">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-4.jpg" alt="Plataforma de Análise de Dados" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">DataInsight</h3>
+                                <p class="text-gray-600 mb-4">Plataforma de análise de dados em tempo real com dashboards personalizáveis e insights automatizados.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Python</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">AWS</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Tableau</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 5 -->
+                    <div class="portfolio-item web" data-category="web">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-5.jpg" alt="Plataforma Educacional" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">EduLearn</h3>
+                                <p class="text-gray-600 mb-4">Plataforma de ensino online com cursos, avaliações, fóruns de discussão e certificados digitais.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Vue.js</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Laravel</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">MySQL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 6 -->
+                    <div class="portfolio-item mobile" data-category="mobile">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+                            <div class="relative">
+                                <img src="../public/images/project-6.jpg" alt="Aplicativo de Saúde" class="w-full h-64 object-cover">
+                                <div class="absolute inset-0 bg-blue-600 bg-opacity-80 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
+                                    <a href="#" class="text-white bg-transparent hover:bg-white hover:text-blue-600 border border-white font-bold py-2 px-4 rounded-lg transition duration-300 mx-2">Ver Detalhes</a>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">HealthTrack</h3>
+                                <p class="text-gray-600 mb-4">Aplicativo de monitoramento de saúde com integração a dispositivos wearables, lembretes de medicação e telemedicina.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">React Native</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">GraphQL</span>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">MongoDB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="py-16 bg-gray-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">O Que Nossos Clientes Dizem</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600">5.0</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">"A MibiTech transformou completamente nosso processo de vendas com o desenvolvimento do nosso e-commerce. A plataforma é intuitiva, rápida e nos ajudou a aumentar nossas vendas em mais de 200% no primeiro ano."</p>
+                        <div class="flex items-center">
+                            <img src="../public/images/client-1.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="font-bold">Roberto Mendes</h4>
+                                <p class="text-gray-600">CEO, Moda Express</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600">5.0</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">"O aplicativo de delivery desenvolvido pela MibiTech revolucionou nosso negócio. A equipe foi extremamente profissional, entregando o projeto no prazo e com todas as funcionalidades que precisávamos."</p>
+                        <div class="flex items-center">
+                            <img src="../public/images/client-2.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="font-bold">Carla Sousa</h4>
+                                <p class="text-gray-600">Proprietária, Sabor Gourmet</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="text-yellow-400 flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-600">4.5</span>
+                        </div>
+                        <p class="text-gray-600 mb-6">"Implementamos o sistema ERP da MibiTech há dois anos e foi uma das melhores decisões que tomamos. O sistema é robusto, confiável e o suporte técnico é excepcional. Recomendo fortemente."</p>
+                        <div class="flex items-center">
+                            <img src="../public/images/client-3.jpg" alt="Cliente" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <h4 class="font-bold">Fernando Almeida</h4>
+                                <p class="text-gray-600">Diretor Financeiro, Construtech</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-16 bg-blue-600 text-white">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold mb-6">Pronto para iniciar seu projeto?</h2>
+                <p class="text-xl mb-8 max-w-3xl mx-auto">Entre em contato conosco hoje mesmo e descubra como podemos ajudar a transformar sua ideia em realidade.</p>
+                <a href="contato.html" class="bg-white text-blue-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg transition duration-300 inline-block">Fale Conosco</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white pt-12 pb-6">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">MibiTech</h3>
+                        <p class="mb-4">Soluções inovadoras em tecnologia para transformar o seu negócio.</p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Links Rápidos</h3>
+                        <ul class="space-y-2">
+                            <li><a href="index.html" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
+                            <li><a href="sobre.html" class="text-gray-400 hover:text-white transition duration-300">Sobre Nós</a></li>
+                            <li><a href="portfolio.html" class="text-gray-400 hover:text-white transition duration-300">Portfólio</a></li>
+                            <li><a href="blog.html" class="text-gray-400 hover:text-white transition duration-300">Blog</a></li>
+                            <li><a href="contato.html" class="text-gray-400 hover:text-white transition duration-300">Contato</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Serviços</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Desenvolvimento de Software</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Aplicativos Móveis</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Cloud Computing</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Segurança da Informação</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Business Intelligence</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Contato</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-map-marker-alt mt-1 mr-3 text-gray-400"></i>
+                                <span>Av. Paulista, 1000, São Paulo - SP</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-phone-alt mt-1 mr-3 text-gray-400"></i>
+                                <span>+55 (11) 3000-4000</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-envelope mt-1 mr-3 text-gray-400"></i>
+                                <span>contato@mibitech.com.br</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 pt-6 text-center text-gray-400">
+                    <p>&copy; 2025 MibiTech. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="../public/js/main.js"></script>
+</body>
+</html>

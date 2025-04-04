@@ -1,129 +1,305 @@
-# Aplicação Django com Docker Swarm e Nginx
+# MibiTech Website
 
-Esta é uma aplicação Django simples "Hello World" configurada para ser implantada usando Docker Swarm e Nginx. A stack foi projetada para ser implantada via Portainer em um servidor Ubuntu 24.04.
+A modern website for MibiTech company with a Django backend API and a JavaScript frontend.
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
-.
-├── app/                    # Aplicação Django
-│   ├── django_app/         # Projeto Django
-│   ├── Dockerfile          # Dockerfile para a aplicação Django
-│   └── requirements.txt    # Dependências Python
-├── nginx/                  # Configuração do Nginx
-│   ├── Dockerfile          # Dockerfile para o Nginx
-│   └── nginx.conf          # Arquivo de configuração do Nginx
-├── traefik/                # Configuração do Traefik (referência apenas)
-│   └── traefik.yml         # Arquivo de configuração do Traefik
-└── docker-stack.yml        # Arquivo de stack do Docker Swarm
+mibitech/
+├── backend/             # Django backend API
+│   ├── api/             # API app
+│   ├── backend/         # Django project settings
+│   ├── Dockerfile       # Backend Docker configuration
+│   └── requirements.txt # Python dependencies
+├── frontend/            # JavaScript frontend
+│   ├── controllers/     # Frontend controllers
+│   ├── models/          # Frontend models
+│   ├── public/          # Static assets
+│   ├── views/           # HTML views
+│   ├── Dockerfile       # Frontend Docker configuration
+│   └── server.js        # Node.js server
+├── nginx/               # Nginx configuration
+│   ├── Dockerfile       # Nginx Docker configuration
+│   └── nginx.conf       # Nginx configuration file
+├── docker-compose.yml   # Docker Compose configuration
+├── deploy.sh            # Deployment script for Linux/Mac
+└── deploy.bat           # Deployment script for Windows
 ```
 
-## Pré-requisitos
+## Local Development Setup
 
-- Docker e Docker Swarm inicializados no Ubuntu 24.04
-- Portainer instalado
-- Traefik já configurado e em execução
-- Rede `network_public` já criada
+### Prerequisites
 
-## Instruções de Implantação
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Git](https://git-scm.com/downloads)
 
-### 1. Criar os volumes externos necessários
+### Running Locally
 
-```bash
-docker volume create django_app_data
-docker volume create nginx_data
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/mibitech.git
+   cd mibitech
+   ```
 
-### 2. Construir as imagens Docker
+2. Build and start the containers:
+   ```bash
+   # Linux/Mac
+   ./deploy.sh --build --up
+   
+   # Windows
+   deploy.bat --build --up
+   ```
 
-```bash
-# Na pasta raiz do projeto
-docker build -t django_app:latest ./app
-docker build -t nginx_app:latest ./nginx
-```
+3. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000/api/
+   - Admin panel: http://localhost:8000/admin/
 
-### 3. Implantar a stack via Portainer
+## Deployment to a VPS
 
-1. Faça login na sua instância do Portainer
-2. Navegue até Stacks
-3. Clique em "Adicionar stack"
-4. Faça upload do arquivo `docker-stack.yml` ou cole seu conteúdo
-5. Nomeie sua stack (ex: "django-nginx")
-6. Clique em "Implantar a stack"
+### Prerequisites
 
-### 4. Acessar a aplicação
+- A VPS with Ubuntu 20.04 or later
+- Docker and Docker Compose installed on the VPS
+- Domain name (optional)
 
-- Aplicação Django: https://appteste.mibitech.com.br
-- Proxy Nginx: https://nginx-appteste.mibitech.com.br
+### Step 1: Set Up Your VPS
 
-## Configuração
+1. Connect to your VPS via SSH:
+   ```bash
+   ssh username@your-vps-ip
+   ```
 
-### Escalando os serviços
+2. Update the system:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
 
-Você pode escalar os serviços alterando o valor de `replicas` no arquivo `docker-stack.yml` ou através da interface do Portainer.
+3. Install Docker:
+   ```bash
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sudo sh get-docker.sh
+   ```
 
-### Nomes de domínio personalizados
+4. Install Docker Compose:
+   ```bash
+   sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
 
-Para usar nomes de domínio personalizados, atualize as regras `Host` nas labels `traefik` no arquivo `docker-stack.yml`.
+5. Add your user to the docker group:
+   ```bash
+   sudo usermod -aG docker $USER
+   ```
 
-## Solução de Problemas
+6. Log out and log back in for the changes to take effect.
 
-- Verifique os logs de cada serviço no Portainer
-- Certifique-se de que todos os volumes foram criados corretamente
-- Verifique se a rede `network_public` existe e está configurada corretamente
-- Confirme que o Traefik está configurado para usar o resolver Let's Encrypt
+### Step 2: Deploy the Application
 
-## Considerações de Segurança
+1. Clone the repository on your VPS:
+   ```bash
+   git clone https://github.com/yourusername/mibitech.git
+   cd mibitech
+   ```
 
-Para uso em produção:
-- Substitua a chave secreta do Django
-- Configure HTTPS com certificados adequados (já configurado via Traefik)
-- Proteja os endpoints com autenticação quando necessário
+2. Create a `.env` file for environment variables (optional):
+   ```bash
+   touch .env
+   ```
 
-## Subir para o GitHub
+3. Edit the `.env` file with your configuration:
+   ```
+   DEBUG=False
+   ALLOWED_HOSTS=your-domain.com,www.your-domain.com
+   ```
 
-Para subir este projeto para o repositório GitHub "rlcunha", siga estas etapas:
+4. Build and start the containers:
+   ```bash
+   ./deploy.sh --build --up
+   ```
 
-### No Windows:
+5. Access your application at your VPS IP address or domain name.
 
-1. Instale o Git para Windows se ainda não tiver: https://git-scm.com/download/win
-2. Abra o Git Bash ou o PowerShell na pasta do projeto
-3. Execute os seguintes comandos:
+### Step 3: Set Up Domain Name (Optional)
 
-```bash
-# Inicializar o repositório Git
-git init
+1. Configure your domain's DNS settings to point to your VPS IP address.
 
-# Adicionar todos os arquivos ao repositório
-git add .
+2. Update the nginx configuration in `nginx/nginx.conf`:
+   ```
+   server_name your-domain.com www.your-domain.com;
+   ```
 
-# Fazer o commit inicial
-git commit -m "Versão inicial da aplicação Django com Docker Swarm e Nginx"
+3. Restart the nginx container:
+   ```bash
+   ./deploy.sh --restart --nginx
+   ```
 
-# Configurar o repositório remoto (substitua 'seu-usuario' pelo seu nome de usuário do GitHub)
-git remote add origin https://github.com/seu-usuario/rlcunha.git
+### Step 4: Set Up SSL with Let's Encrypt (Optional)
 
-# Configurar a branch principal como 'main'
-git branch -M main
+1. Install Certbot:
+   ```bash
+   sudo apt install certbot python3-certbot-nginx -y
+   ```
 
-# Fazer push para o repositório remoto
-git push -u origin main
-```
+2. Obtain SSL certificate:
+   ```bash
+   sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+   ```
 
-### No Linux/Mac:
+3. Follow the prompts to complete the SSL setup.
 
-1. Torne o script git_setup.sh executável:
-```bash
-chmod +x git_setup.sh
-```
+## Docker Container Management
 
-2. Execute o script:
-```bash
-./git_setup.sh
-```
+### Using the Deployment Scripts
 
-3. Siga as instruções na tela para completar o processo.
+The project includes deployment scripts for both Linux/Mac (`deploy.sh`) and Windows (`deploy.bat`) to simplify Docker container management.
 
-## Tutorial para Iniciantes
+#### Available Commands
 
-Se você é iniciante, consulte o arquivo `TUTORIAL_SIMPLES.md` para instruções passo a passo sobre como implantar esta aplicação em uma VPS.
+- Build containers:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --build
+  
+  # Windows
+  deploy.bat --build
+  ```
+
+- Start containers:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --up
+  
+  # Windows
+  deploy.bat --up
+  ```
+
+- Stop containers:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --down
+  
+  # Windows
+  deploy.bat --down
+  ```
+
+- Restart containers:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --restart
+  
+  # Windows
+  deploy.bat --restart
+  ```
+
+- View logs:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --logs
+  
+  # Windows
+  deploy.bat --logs
+  ```
+
+#### Managing Individual Containers
+
+You can also manage individual containers by specifying the service name:
+
+- Frontend:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --frontend --restart
+  
+  # Windows
+  deploy.bat --frontend --restart
+  ```
+
+- Backend:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --backend --logs
+  
+  # Windows
+  deploy.bat --backend --logs
+  ```
+
+- Nginx:
+  ```bash
+  # Linux/Mac
+  ./deploy.sh --nginx --build
+  
+  # Windows
+  deploy.bat --nginx --build
+  ```
+
+## Updating the Application
+
+### Pulling Changes from Git
+
+1. Navigate to your project directory:
+   ```bash
+   cd mibitech
+   ```
+
+2. Pull the latest changes:
+   ```bash
+   git pull origin main
+   ```
+
+3. Rebuild and restart the containers:
+   ```bash
+   # Linux/Mac
+   ./deploy.sh --build --restart
+   
+   # Windows
+   deploy.bat --build --restart
+   ```
+
+### Making Individual Service Updates
+
+If you only need to update a specific service:
+
+1. Pull the latest changes:
+   ```bash
+   git pull origin main
+   ```
+
+2. Rebuild and restart only the affected service:
+   ```bash
+   # For frontend updates (Linux/Mac)
+   ./deploy.sh --frontend --build --restart
+   
+   # For backend updates (Windows)
+   deploy.bat --backend --build --restart
+   ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Container fails to start**:
+   - Check the logs: `./deploy.sh --logs`
+   - Verify environment variables in `.env` file
+   - Ensure ports are not already in use
+
+2. **Cannot connect to the application**:
+   - Verify containers are running: `docker-compose ps`
+   - Check firewall settings on your VPS
+   - Ensure correct ports are exposed in `docker-compose.yml`
+
+3. **Database connection issues**:
+   - Check database credentials in environment variables
+   - Verify database container is running
+
+### Getting Help
+
+If you encounter any issues not covered in this documentation, please:
+
+1. Check the logs for error messages
+2. Consult the Docker and Docker Compose documentation
+3. Open an issue on the GitHub repository
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -1,0 +1,323 @@
+/* Custom Styles for MibiTech Website */
+
+/* General Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-in-out;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Custom Button Hover Effect */
+.btn-hover-effect {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-hover-effect:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    z-index: -2;
+}
+
+.btn-hover-effect:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: all .3s;
+    z-index: -1;
+}
+
+.btn-hover-effect:hover:before {
+    width: 100%;
+}
+
+/* Custom Card Hover Effect */
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Image Hover Effect */
+.img-hover-zoom {
+    overflow: hidden;
+}
+
+.img-hover-zoom img {
+    transition: transform 0.5s ease;
+}
+
+.img-hover-zoom:hover img {
+    transform: scale(1.05);
+}
+
+/* Custom Underline Animation for Links */
+.link-underline {
+    position: relative;
+    display: inline-block;
+}
+
+.link-underline:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: currentColor;
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+}
+
+.link-underline:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+/* Custom Form Styles */
+.custom-input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Custom Tooltip */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.75rem;
+    }
+    
+    h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Portfolio Filter Active State */
+.filter-btn.active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* FAQ Toggle Animation */
+.faq-toggle[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Blog Card Hover Effect */
+.blog-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Service Card Icon Animation */
+.service-icon {
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1);
+}
+
+/* Team Member Social Media Icons */
+.team-social-icons {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.team-member:hover .team-social-icons {
+    opacity: 1;
+}
+
+/* Custom Gradient Text */
+.gradient-text {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Custom Badge */
+.custom-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: #3b82f6;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.custom-checkbox .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
