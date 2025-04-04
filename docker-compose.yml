@@ -1,97 +1,71 @@
-version: '3.8'
+version: '3.7'
 
 # Use um nome de projeto específico para evitar conflitos
 name: mibitech
 
 services:
-  traefik:
-    image: traefik:v2.9
-    container_name: mibitech-traefik
-    # Não interfere com outros Traefik que possam estar rodando
-    restart: always
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.file.directory=/etc/traefik/dynamic"
-      - "--providers.file.watch=true"
-    ports:
-      # Use portas não padrão para evitar conflitos com outros serviços
-      - "8081:80"  # HTTP
-      - "8443:443"  # HTTPS
-      - "8082:8080"  # Dashboard
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro
-    networks:
-      - mibitech-internal-network
+  # Não precisamos definir o Traefik aqui, pois já está rodando no servidor
 
   backend:
     build: ./backend
-    container_name: mibitech-backend
-    restart: always
+    image: mibitech-backend:latest
     volumes:
       - ./backend:/app
       - backend_static:/app/static
-    expose:
-      - "8000"
+    networks:
+      - network_public
     environment:
       - DEBUG=False
       - ALLOWED_HOSTS=localhost,127.0.0.1,backend,site.mibitech.com.br
-    networks:
-      - mibitech-internal-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`site.mibitech.com.br`) && (PathPrefix(`/api`) || PathPrefix(`/admin`))"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mibitech_backend.rule=Host(`site.mibitech.com.br`) && (PathPrefix(`/api`) || PathPrefix(`/admin`))"
+        - "traefik.http.routers.mibitech_backend.entrypoints=websecure"
+        - "traefik.http.routers.mibitech_backend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.mibitech_backend.loadbalancer.server.port=8000"
+        - "traefik.http.services.mibitech_backend.loadbalancer.passHostHeader=true"
 
   frontend:
     build: ./frontend
-    container_name: mibitech-frontend
-    restart: always
+    image: mibitech-frontend:latest
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    expose:
-      - "3000"
     depends_on:
       - backend
     environment:
       - API_URL=http://backend:8000
     networks:
-      - mibitech-internal-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`site.mibitech.com.br`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-      - "traefik.http.routers.frontend.priority=1"
+      - network_public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mibitech_frontend.rule=Host(`site.mibitech.com.br`)"
+        - "traefik.http.routers.mibitech_frontend.entrypoints=websecure"
+        - "traefik.http.routers.mibitech_frontend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.mibitech_frontend.loadbalancer.server.port=3000"
+        - "traefik.http.services.mibitech_frontend.loadbalancer.passHostHeader=true"
+        - "traefik.http.routers.mibitech_frontend.priority=1"
 
-  # Nginx service commented out as we're now using Traefik
-  # nginx:
-  #   build: ./nginx
-  #   container_name: mibitech-nginx
-  #   restart: always
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     - backend
-  #     - frontend
-  #   volumes:
-  #     - backend_static:/static
-  #   networks:
-  #     - mibitech-network
+# Configuração para Docker Swarm
+# Para implantar: docker stack deploy -c docker-compose.yml mibitech
+    name: mibitech_backend_static
 
 networks:
-  mibitech-internal-network:
-    driver: bridge
-    # Isola completamente esta rede de outras redes Docker
-    internal: false
-    name: mibitech-internal-network
+  network_public:
+    external: true
+    name: network_public
 
 volumes:
   backend_static:

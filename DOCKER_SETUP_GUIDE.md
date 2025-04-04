@@ -1,6 +1,6 @@
-# Guia para Executar o Docker Compose com Traefik (Configuração Isolada)
+# Guia para Executar o Docker Compose com Traefik (Integração com Infraestrutura Existente)
 
-Este guia explica como executar o arquivo `docker-compose.yml` do projeto site_mibitech, que utiliza o Traefik como proxy reverso em uma configuração isolada que não interfere com outros sites no servidor.
+Este guia explica como executar o arquivo `docker-compose.yml` do projeto site_mibitech, que utiliza o Traefik existente no servidor como proxy reverso, integrando-se com outros sites WordPress.
 
 ## Pré-requisitos
 
@@ -19,9 +19,8 @@ Antes de executar o Docker Compose, certifique-se de que você tem:
 ### 1. Parar Serviços Locais (se necessário)
 
 Se você estiver executando serviços localmente que usam as mesmas portas, pare-os:
-- Porto 80 (HTTP - Traefik)
-- Porto 443 (HTTPS - Traefik)
-- Porto 8080 (Dashboard do Traefik)
+- Porto 80 (HTTP)
+- Porto 443 (HTTPS)
 
 ### 2. Usando os Scripts de Deploy (Recomendado)
 
@@ -36,7 +35,6 @@ deploy.bat --build --up
 # OU para construir e iniciar contêineres específicos
 deploy.bat --frontend --build --up
 deploy.bat --backend --build --up
-deploy.bat --traefik --build --up
 ```
 
 #### No Linux/Mac:
@@ -51,7 +49,6 @@ chmod +x deploy.sh
 # OU para construir e iniciar contêineres específicos
 ./deploy.sh --frontend --build --up
 ./deploy.sh --backend --build --up
-./deploy.sh --traefik --build --up
 ```
 
 ### 3. Usando Docker Compose Diretamente
@@ -72,26 +69,22 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-## Configuração Isolada
+## Integração com Infraestrutura Existente
 
-Esta configuração foi projetada para ser completamente independente e não interferir com outros sites ou serviços Docker que possam estar rodando no servidor:
+Esta configuração foi projetada para integrar-se com a infraestrutura Traefik existente no servidor:
 
-1. **Rede Docker isolada**: Todos os serviços usam uma rede Docker dedicada chamada `mibitech-internal-network`
-2. **Portas não padrão**: O Traefik usa portas não padrão para evitar conflitos:
-   - Porta 8081 para HTTP (em vez da porta 80)
-   - Porta 8443 para HTTPS (em vez da porta 443)
-   - Porta 8082 para o Dashboard (em vez da porta 8080)
-3. **Nomes de contêineres específicos**: Todos os contêineres têm o prefixo `mibitech-` para evitar conflitos de nomes
-4. **Configuração Traefik isolada**: O Traefik está configurado para não expor automaticamente todos os contêineres
+1. **Rede Docker compartilhada**: Os serviços usam a rede Docker existente chamada `network_public`
+2. **Traefik existente**: Utiliza o Traefik já em execução no servidor, sem necessidade de iniciar uma nova instância
+3. **Certificados SSL**: Aproveita o resolvedor de certificados Let's Encrypt já configurado
+4. **Compatibilidade com Swarm**: Configurado para funcionar com Docker Swarm, que já está em uso no servidor
 
 ## Verificando a Instalação
 
 Após iniciar os contêineres, você pode acessar:
 
-- Frontend: http://site.mibitech.com.br:8081/
-- Backend API: http://site.mibitech.com.br:8081/api/
-- Admin do Django: http://site.mibitech.com.br:8081/admin/
-- Dashboard do Traefik: http://localhost:8082/ (para monitoramento)
+- Frontend: https://site.mibitech.com.br/
+- Backend API: https://site.mibitech.com.br/api/
+- Admin do Django: https://site.mibitech.com.br/admin/
 
 ### Configurando o Host Local
 
@@ -149,14 +142,12 @@ Se você receber um erro indicando que as portas já estão em uso:
 ```bash
 # Verifique quais processos estão usando as portas
 # Windows (PowerShell)
-netstat -ano | findstr :8081
-netstat -ano | findstr :8443
-netstat -ano | findstr :8082
+netstat -ano | findstr :80
+netstat -ano | findstr :443
 
 # Linux/Mac
-lsof -i :8081
-lsof -i :8443
-lsof -i :8082
+lsof -i :80
+lsof -i :443
 ```
 
 ### Problemas de Permissão
@@ -178,47 +169,47 @@ docker-compose logs -f
 # Ver logs de um contêiner específico
 docker-compose logs -f backend
 docker-compose logs -f frontend
-docker-compose logs -f nginx
 ```
 
-## Coexistência com Outros Sites
+## Integração com Docker Swarm
 
-Esta configuração permite que o site MibiTech coexista com outros sites no mesmo servidor:
+Esta configuração está preparada para ser implantada em um ambiente Docker Swarm:
 
-1. **Sem conflito de portas**: Como estamos usando portas não padrão, não haverá conflito com outros serviços que usam as portas padrão 80/443
-2. **Rede isolada**: A rede Docker isolada garante que não haja interferência com outros contêineres
-3. **Configuração independente**: O Traefik está configurado para gerenciar apenas os serviços deste projeto
+1. **Configuração de deploy**: Inclui configurações específicas para o Swarm, como `replicas` e `constraints`
+2. **Redes externas**: Utiliza a rede `network_public` existente no Swarm
+3. **Compatibilidade com stack**: Pode ser implantado usando o comando `docker stack deploy`
 
-### Configuração em Produção
+### Implantação no Swarm
 
-Para um ambiente de produção, você pode:
+Para implantar no ambiente Swarm:
 
-1. **Usar um subdomínio**: Configure o DNS para apontar um subdomínio específico (como mibitech.seudominio.com) para o IP do servidor
-2. **Configurar um proxy reverso externo**: Use o Nginx ou Apache existente no servidor para encaminhar solicitações para as portas do Traefik
-3. **Configurar regras de firewall**: Certifique-se de que as portas 8081, 8443 e 8082 estão abertas no firewall
+```bash
+# Verificar se o Swarm está ativo
+docker node ls
 
-### Exemplo de Configuração Nginx para Proxy Reverso
+# Implantar o stack
+docker stack deploy -c docker-compose.yml mibitech
+```
 
-Se você já tem o Nginx rodando no servidor para outros sites, pode adicionar esta configuração:
+### Verificando o Status no Swarm
 
-```nginx
-server {
-    listen 80;
-    server_name site.mibitech.com.br;
+Para verificar o status dos serviços no Swarm:
 
-    location / {
-        proxy_pass http://localhost:8081;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+```bash
+# Listar todos os serviços
+docker service ls
+
+# Ver logs de um serviço específico
+docker service logs mibitech_frontend
+docker service logs mibitech_backend
+
+# Escalar um serviço
+docker service scale mibitech_frontend=2
 ```
 
 ## Conclusão
 
-Seguindo estes passos, você conseguirá executar o projeto site_mibitech de forma isolada, sem interferir com outros sites ou serviços no servidor.
+Seguindo estes passos, você conseguirá executar o projeto site_mibitech integrado à infraestrutura Traefik existente no servidor, compartilhando recursos com outros sites WordPress e aproveitando a configuração de SSL já existente.
 
 ## Sobre o Traefik
 
