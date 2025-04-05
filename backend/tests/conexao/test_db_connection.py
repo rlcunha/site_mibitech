@@ -35,7 +35,7 @@ def test_connection():
         load_dotenv()
         
         # Obtém a URL de conexão do ambiente ou usa o valor padrão
-        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/mibitech")
+        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Mfcd62!!Mfcd62!!@server.mibitech.com.br:5432/mibitech")
         
         logger.info(f"Tentando conectar ao banco de dados: {DATABASE_URL}")
         

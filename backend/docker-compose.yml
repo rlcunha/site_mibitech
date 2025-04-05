@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 
 services:
   api:
@@ -11,3 +11,17 @@ services:
       - APP_PORT=8000
       - ENVIRONMENT=development
       - CORS_ORIGINS=*
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.backend.rule=Host(`api.mibitech.com.br`)"
+        - "traefik.http.services.backend.loadbalancer.server.port=8000"
+        - "traefik.http.routers.backend.entrypoints=web,websecure"
+    networks:
+      - traefik-public
+    restart: always
+
+networks:
+  traefik-public:
+    external: true
