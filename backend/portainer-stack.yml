@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:Mfcd62!!@server.mibitech.com.br:5432/mibitech
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!Mfcd62!!@server.mibitech.com.br:5432/mibitech
       - APP_HOST=0.0.0.0
       - APP_PORT=8000
       - ENVIRONMENT=development
@@ -19,9 +19,9 @@ services:
         - "traefik.http.services.backend.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend.entrypoints=web,websecure"
     networks:
-      - traefik-public
+      - public-network
     restart: always
 
 networks:
-  traefik-public:
+  public-network:
     external: true
