@@ -2,26 +2,27 @@
 
 Este documento explica como utilizar o Docker Compose para executar o módulo de backend da MibiTech.
 
-## Serviços Configurados
+## Serviço Configurado
 
-O arquivo `docker-compose.yml` configura os seguintes serviços:
+O arquivo `docker-compose.yml` configura o seguinte serviço:
 
-1. **api**: Serviço principal do backend que roda a aplicação FastAPI
-   - Expõe a API REST na porta 8000
-   - Conecta-se automaticamente ao banco de dados PostgreSQL
+**api**: Serviço principal do backend que roda a aplicação FastAPI
+- Expõe a API REST na porta 8000
+- Conecta-se ao banco de dados PostgreSQL existente
+- Usa um Dockerfile modificado para construir a imagem
 
-2. **postgres**: Banco de dados PostgreSQL
-   - Armazena todos os dados da aplicação
-   - Expõe a porta 5432 para conexões
+## Arquivos Modificados
 
-3. **pgadmin**: Interface web para administração do PostgreSQL (opcional)
-   - Acessível na porta 5050
-   - Útil para gerenciar o banco de dados visualmente
+Para garantir o funcionamento correto do serviço sem depender de um banco de dados PostgreSQL local, foram criados os seguintes arquivos:
+
+1. **start_modified.sh**: Versão modificada do script de inicialização que não espera por um serviço PostgreSQL local
+2. **Dockerfile.modified**: Versão modificada do Dockerfile que usa o script start_modified.sh
 
 ## Pré-requisitos
 
 - Docker instalado (versão 19.03.0+)
 - Docker Compose instalado (versão 1.27.0+)
+- Servidor PostgreSQL já configurado e acessível em server.mibitech.com.br
 
 ## Como Executar
 
@@ -30,12 +31,12 @@ O arquivo `docker-compose.yml` configura os seguintes serviços:
    cd backend
    ```
 
-2. Inicie os serviços com Docker Compose:
+2. Inicie o serviço com Docker Compose:
    ```bash
    docker-compose up -d
    ```
 
-3. Verifique se os serviços estão rodando:
+3. Verifique se o serviço está rodando:
    ```bash
    docker-compose ps
    ```
@@ -45,11 +46,6 @@ O arquivo `docker-compose.yml` configura os seguintes serviços:
    - Status: http://localhost:8000/api/status
    - Endpoint principal: http://localhost:8000/
 
-5. Acesse o PgAdmin (opcional):
-   - URL: http://localhost:5050
-   - Email: admin@mibitech.com.br
-   - Senha: Mfcd62!!
-
 ## Logs e Monitoramento
 
 Para visualizar os logs do serviço de backend:
@@ -57,57 +53,49 @@ Para visualizar os logs do serviço de backend:
 docker-compose logs -f api
 ```
 
-Para visualizar os logs do banco de dados:
-```bash
-docker-compose logs -f postgres
-```
+## Parando o Serviço
 
-## Parando os Serviços
-
-Para parar todos os serviços:
+Para parar o serviço:
 ```bash
 docker-compose down
-```
-
-Para parar e remover volumes (isso apagará os dados do banco):
-```bash
-docker-compose down -v
-```
-
-## Reconstruindo a Imagem
-
-Se você fizer alterações no código ou no Dockerfile, reconstrua a imagem:
-```bash
-docker-compose build
-```
-
-Ou para reconstruir e iniciar:
-```bash
-docker-compose up -d --build
 ```
 
 ## Variáveis de Ambiente
 
 As principais variáveis de ambiente configuradas são:
 
-- `DATABASE_URL`: URL de conexão com o banco de dados
+- `DATABASE_URL`: URL de conexão com o banco de dados PostgreSQL existente
 - `APP_HOST`: Host onde a aplicação será executada (0.0.0.0 para acessar de qualquer lugar)
 - `APP_PORT`: Porta onde a aplicação será executada (8000)
 - `ENVIRONMENT`: Ambiente de execução (development, production, etc.)
 - `CORS_ORIGINS`: Origens permitidas para CORS (Cross-Origin Resource Sharing)
 
-## Volumes e Persistência
+## Conexão com o Banco de Dados
 
-O serviço PostgreSQL utiliza um volume Docker nomeado (`mibitech_postgres_data`) para persistir os dados do banco entre reinicializações dos contêineres.
+O serviço se conecta a um servidor PostgreSQL existente. A conexão é configurada através da variável de ambiente `DATABASE_URL` no formato:
 
-## Redes
+```
+postgresql://postgres:Mfcd62!!@server.mibitech.com.br:5432/mibitech
+```
 
-Os serviços estão configurados para usar uma rede Docker dedicada (`mibitech_backend_network`), garantindo isolamento e comunicação segura entre os contêineres.
+Onde:
+- `postgres`: usuário do banco de dados
+- `Mfcd62!!`: senha do banco de dados
+- `server.mibitech.com.br`: hostname do servidor PostgreSQL
+- `5432`: porta do servidor PostgreSQL
+- `mibitech`: nome do banco de dados
+
+## Dockerfile Modificado
+
+O serviço utiliza um Dockerfile modificado (`Dockerfile.modified`) para construir a imagem. As principais modificações são:
+
+1. Usa o script `start_modified.sh` em vez do script `start.sh` original
+2. O script modificado não espera por um serviço PostgreSQL local, permitindo a conexão direta com o banco de dados externo
 
 ## Resolução de Problemas
 
 1. **API não inicia**: Verifique os logs com `docker-compose logs api`
-2. **Erro de conexão com o banco**: Verifique se o PostgreSQL está rodando com `docker-compose ps`
+2. **Erro de conexão com o banco**: Verifique se o servidor PostgreSQL está acessível em server.mibitech.com.br
 3. **Erro de migração**: Verifique os logs do serviço API durante a inicialização
 
 ## Segurança

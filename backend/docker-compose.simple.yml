@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  api:
+    image: python:3.9-slim
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash -c "pip install -r requirements.txt && python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!@server.mibitech.com.br:5432/mibitech
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000

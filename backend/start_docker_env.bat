@@ -1,6 +1,6 @@
 @echo off
 REM Script para iniciar o ambiente Docker do backend MibiTech
-REM Este script inicia os contêineres Docker e testa a API
+REM Este script inicia o contêiner Docker da API e testa a API
 
 echo ===================================================
 echo INICIANDO AMBIENTE DOCKER PARA BACKEND MIBITECH
@@ -23,26 +23,25 @@ if %ERRORLEVEL% NEQ 0 (
 echo [INFO] Verificando se há contêineres antigos...
 docker-compose down 2>nul
 
-echo [INFO] Construindo e iniciando os contêineres...
+echo [INFO] Construindo e iniciando o contêiner da API...
 docker-compose up -d --build
 
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERRO] Falha ao iniciar os contêineres Docker.
+    echo [ERRO] Falha ao iniciar o contêiner Docker.
     exit /b 1
 )
 
-echo [INFO] Contêineres iniciados com sucesso!
+echo [INFO] Contêiner iniciado com sucesso!
 echo.
-echo [INFO] Serviços disponíveis:
+echo [INFO] Serviço disponível:
 echo  - API Backend: http://localhost:8000
 echo  - API Docs: http://localhost:8000/api/docs
-echo  - PgAdmin: http://localhost:5050
 echo.
 
-echo [INFO] Aguardando serviços inicializarem...
+echo [INFO] Aguardando serviço inicializar...
 timeout /t 10 /nobreak >nul
 
-echo [INFO] Verificando status dos contêineres:
+echo [INFO] Verificando status do contêiner:
 docker-compose ps
 
 echo.
@@ -72,5 +71,5 @@ echo AMBIENTE DOCKER INICIADO COM SUCESSO!
 echo ===================================================
 echo.
 echo Para visualizar logs: docker-compose logs -f
-echo Para parar os serviços: docker-compose down
+echo Para parar o serviço: docker-compose down
 echo.

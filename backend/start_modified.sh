@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Não espera pelo serviço postgres, pois estamos usando um banco de dados externo
-echo "Conectando ao banco de dados externo..."
+# Skip waiting for postgres since we're connecting to an external database
+echo "Connecting to external database..."
 
 # Initialize database
 python init_db.py

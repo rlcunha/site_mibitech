@@ -26,11 +26,18 @@ chmod +x start_docker_env.sh
 ```
 
 Estes scripts irão:
-1. Iniciar todos os contêineres necessários
-2. Verificar se os serviços estão funcionando
+1. Construir e iniciar o contêiner da API
+2. Verificar se o serviço está funcionando
 3. Executar testes básicos na API
 
 Para mais detalhes sobre a configuração Docker, consulte [README_DOCKER.md](README_DOCKER.md).
+
+## Arquivos Modificados
+
+Para garantir o funcionamento correto do serviço sem depender de um banco de dados PostgreSQL local, foram criados os seguintes arquivos:
+
+1. **start_modified.sh**: Versão modificada do script de inicialização que não espera por um serviço PostgreSQL local
+2. **Dockerfile.modified**: Versão modificada do Dockerfile que usa o script start_modified.sh
 
 ## Configuração Manual
 
@@ -46,7 +53,7 @@ Para mais detalhes sobre a configuração Docker, consulte [README_DOCKER.md](RE
 
 3. Execute com Docker:
    ```bash
-   docker-compose up --build
+   docker-compose up -d --build
    ```
 
 4. Ou execute localmente:
@@ -74,19 +81,15 @@ Após iniciar o servidor, acesse a documentação da API em:
 
 ## Implantação
 
-1. Construa a imagem Docker:
-   ```bash
-   docker-compose build
-   ```
-
-2. Inicie os serviços:
-   ```bash
-   docker-compose up -d
-   ```
+Inicie o serviço:
+```bash
+docker-compose up -d --build
+```
 
 ## Banco de Dados
 
-A API usa PostgreSQL com as seguintes credenciais padrão:
+A API se conecta a um servidor PostgreSQL existente com as seguintes credenciais:
+- Servidor: server.mibitech.com.br
 - Banco de dados: mibitech
 - Usuário: postgres
 - Senha: Mfcd62!!
@@ -150,11 +153,13 @@ backend/
 ├── alembic.ini           # Configuração do Alembic
 ├── docker-compose.yml    # Configuração do Docker Compose
 ├── Dockerfile            # Instruções para construir a imagem Docker
+├── Dockerfile.modified   # Versão modificada do Dockerfile
 ├── init_db.py            # Script de inicialização do banco de dados
 ├── README.md             # Este arquivo
 ├── README_DOCKER.md      # Documentação específica do Docker
 ├── requirements.txt      # Dependências do projeto
+├── start.sh              # Script de inicialização para contêiner Docker
+├── start_modified.sh     # Versão modificada do script de inicialização
 ├── start_docker_env.bat  # Script para iniciar ambiente Docker (Windows)
 ├── start_docker_env.sh   # Script para iniciar ambiente Docker (Linux/macOS)
-├── start.sh              # Script de inicialização para contêiner Docker
 └── test_api.py           # Script para testar a API
