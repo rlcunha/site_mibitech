@@ -1,19 +1,37 @@
-version: '3.7'
+version: '3.8'
 
 services:
-  app:
+  # Serviço da API Backend
+  api:
     build: .
+    container_name: mibitech_backend
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:Mfcd62!!@postgres:5432/mibitech
-    networks:
-      - network_public
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!@server.mibitech.com.br:5432/mibitech
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+      - ENVIRONMENT=development
+      - CORS_ORIGINS=*
+      - SQL_ECHO=false
+      - DB_POOL_SIZE=5
+      - DB_MAX_OVERFLOW=10
+      - DB_POOL_TIMEOUT=30
     volumes:
       - .:/app
     depends_on:
       - postgres
-
+    restart: unless-stopped
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  
 networks:
-  network_public:
-    external: true
+  public_network:
+    driver: bridge
+    name: public_network
