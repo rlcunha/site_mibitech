@@ -121,8 +121,15 @@ const server = http.createServer((req, res) => {
     });
 });
 
-// Start the server
-server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+// Start the server (listen on all interfaces)
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running at http://0.0.0.0:${PORT}/`);
     console.log(`Press Ctrl+C to stop the server`);
+    
+    // Add CORS headers for development
+    server.on('request', (req, res) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    });
 });
