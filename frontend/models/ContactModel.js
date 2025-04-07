@@ -103,8 +103,8 @@ class ContactModel extends DataModel {
         }
 
         try {
-            // Use the Django API endpoint
-            const response = await this.postData('http://localhost:8000/api/submit-contact/', this.formData);
+            // Use the API endpoint
+            const response = await this.postData('https://apirest.mibitech.com.br/api/submit-contact/', this.formData);
             
             this.submitStatus = 'success';
             return response;

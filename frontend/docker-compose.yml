@@ -9,11 +9,12 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.mibitech-frontend.rule=Host(`appteste.mibitech.com.br`)"
         - "traefik.http.routers.mibitech-frontend.entrypoints=websecure"
-        - "traefik.http.routers.mibitech-frontend.tls.certresolver=myresolver"
+        - "traefik.http.routers.mibitech-frontend.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.mibitech-frontend.loadbalancer.server.port=3000"
+        - "traefik.http.routers.mibitech-frontend.priority=10"
     networks:
-      - network_public
+      - traefik-public
 
 networks:
-  network_public:
+  traefik-public:
     external: true
