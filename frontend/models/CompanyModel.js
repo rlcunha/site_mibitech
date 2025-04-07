@@ -45,8 +45,8 @@ class CompanyModel extends DataModel {
 
         try {
             console.log('Fetching social media from API...');
-            const apiUrl = 'http://apirest.mibitech.com.br:8000/api/v1/social-media/';
-            console.log('API URL:', apiUrl);
+            const apiUrl = '/api/v1/social-media/';
+            console.log('Using proxy API URL:', apiUrl);
             
             const data = await this.fetchData(apiUrl);
             console.log('Social media data received:', data);
