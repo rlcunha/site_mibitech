@@ -45,7 +45,7 @@ class CompanyModel extends DataModel {
 
         try {
             console.log('Fetching social media from API...');
-            const data = await this.fetchData('http://127.0.0.1:8000/api/social-media/');
+            const data = await this.fetchData('http://apirest.mibitech.com.br:8000/api/v1/social-media/');
             console.log('Social media data received:', data);
             this.socialMedia = data;
             return data;
