@@ -37,7 +37,10 @@ const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
-    console.log(`${req.method} ${req.url}`);
+    // Log only API requests
+    if (req.url.startsWith('/api/')) {
+        console.log(`${req.method} ${req.url}`);
+    }
     
     // Handle API requests
     if (req.url.startsWith('/api/')) {
