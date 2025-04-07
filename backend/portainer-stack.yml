@@ -23,9 +23,9 @@ services:
         - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
         - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker"
     networks:
-      - traefik-public
+      - network_public
     restart: always
 
 networks:
-  traefik-public:
+  network_public:
     external: true
