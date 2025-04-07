@@ -15,11 +15,11 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`)"
+        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`) || (Host(`appteste.mibitech.com.br`) && PathPrefix(`/api`))"
         - "traefik.http.services.backend.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend.entrypoints=web,websecure"
-        - "traefik.http.routers.backend-appteste.rule=Host(`appteste.mibitech.com.br`) && PathPrefix(`/api`)"
-        - "traefik.http.services.backend-appteste.loadbalancer.server.port=8000"
+        - "traefik.http.routers.backend.priority=100"
+        - "traefik.http.routers.backend.tls.certresolver=letsencryptresolver"
         - "traefik.http.routers.backend-appteste.entrypoints=web,websecure"
     networks:
       - traefik-public

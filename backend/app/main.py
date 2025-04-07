@@ -28,9 +28,9 @@ app = FastAPI(
     title="MibiTech Backend API",
     description="API backend para o website da MibiTech",
     version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json"
+    docs_url="/api/v1/docs",
+    redoc_url="/api/v1/redoc",
+    openapi_url="/api/v1/openapi.json"
 )
 
 # Configuração CORS
@@ -80,10 +80,10 @@ async def log_requests(request: Request, call_next):
 register_error_handlers(app)
 
 # Inclui rotas
-app.include_router(social_media.router, prefix="/api/social-media", tags=["social-media"])
-app.include_router(webhooks.router, prefix="/api/webhooks", tags=["webhooks"])
+app.include_router(social_media.router, prefix="/api/v1/social-media", tags=["social-media"])
+app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["webhooks"])
 
-@app.get("/api/status")
+@app.get("/api/v1/status")
 async def status():
     """
     Endpoint para verificar o status da API.
@@ -133,6 +133,6 @@ async def root():
     """
     return {
         "message": "Bem-vindo à API da MibiTech",
-        "documentation": "/api/docs",
-        "status": "/api/status"
+        "documentation": "/api/v1/docs",
+        "status": "/api/v1/status"
     }
