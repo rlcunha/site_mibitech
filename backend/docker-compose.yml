@@ -20,7 +20,6 @@ services:
         - "traefik.http.routers.backend.entrypoints=web,websecure"
         - "traefik.http.routers.backend.priority=100"
         - "traefik.http.routers.backend.tls.certresolver=letsencryptresolver"
-        - "traefik.http.routers.backend-appteste.entrypoints=web,websecure"
     networks:
       - traefik-public
     restart: always

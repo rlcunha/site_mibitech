@@ -9,10 +9,14 @@ import requests
 import time
 import sys
 import json
+import warnings
 from typing import Dict, Any, Optional
 
+# Suprimir avisos de SSL
+warnings.filterwarnings('ignore', message='Unverified HTTPS request')
+
 # Configuração
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = "https://apirest.mibitech.com.br"
 MAX_RETRIES = 10
 RETRY_INTERVAL = 3  # segundos
 
@@ -55,9 +59,9 @@ def make_request(endpoint: str, method: str = "GET", data: Optional[Dict[str, An
     
     try:
         if method.upper() == "GET":
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=10, verify=False)
         elif method.upper() == "POST":
-            response = requests.post(url, json=data, timeout=10)
+            response = requests.post(url, json=data, timeout=10, verify=False)
         else:
             print_colored(f"Método {method} não suportado", "red")
             return None
@@ -83,7 +87,7 @@ def wait_for_api() -> bool:
         print_colored(f"Tentativa {attempt}/{MAX_RETRIES}...", "yellow")
         
         try:
-            response = requests.get(f"{API_BASE_URL}/api/status", timeout=5)
+            response = requests.get(f"{API_BASE_URL}/api/v1/status", timeout=5, verify=False)
             if response.status_code == 200:
                 print_colored("API está disponível!", "green")
                 return True
@@ -105,7 +109,7 @@ def test_status_endpoint() -> bool:
     """
     print_colored("\nTestando endpoint de status...", "blue")
     
-    response = make_request("/api/status")
+    response = make_request("/api/v1/status")
     if not response:
         return False
         
@@ -128,7 +132,7 @@ def test_social_media_endpoint() -> bool:
     """
     print_colored("\nTestando endpoint de mídias sociais...", "blue")
     
-    response = make_request("/api/social-media")
+    response = make_request("/api/v1/social-media")
     if not response:
         return False
         
