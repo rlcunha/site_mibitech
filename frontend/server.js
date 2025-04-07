@@ -37,20 +37,16 @@ const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
-    // Log only API requests
-    if (req.url.startsWith('/api/')) {
-        console.log(`${req.method} ${req.url}`);
-    }
-    
+    // API request handling (no logging)
     // Handle API requests
     if (req.url.startsWith('/api/')) {
         const apiUrl = `${API_BASE_URL}${req.url}`;
-        console.log(`Proxying to API: ${apiUrl}`);
+        // Proxying API request (no logging)
         
         // Choose http or https module based on API URL
         const client = apiUrl.startsWith('https://') ? https : http;
         
-        console.log('Request headers:', req.headers);
+        // Request headers processing (no logging)
         
         const proxyReq = http.request(apiUrl, (proxyRes) => {
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
