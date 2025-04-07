@@ -45,13 +45,25 @@ class CompanyModel extends DataModel {
 
         try {
             console.log('Fetching social media from API...');
-            const data = await this.fetchData('http://apirest.mibitech.com.br:8000/api/v1/social-media/');
+            const apiUrl = 'http://apirest.mibitech.com.br:8000/api/v1/social-media/';
+            console.log('API URL:', apiUrl);
+            
+            const data = await this.fetchData(apiUrl);
             console.log('Social media data received:', data);
+            
+            if (!data || !Array.isArray(data)) {
+                throw new Error('Dados inválidos recebidos da API');
+            }
+            
             this.socialMedia = data;
             return data;
         } catch (error) {
-            this.error = error.message;
-            console.error('Error fetching social media:', error);
+            this.error = `Erro ao buscar redes sociais: ${error.message}`;
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                url: 'http://apirest.mibitech.com.br:8000/api/v1/social-media/'
+            });
             throw error;
         } finally {
             this.isLoading = false;
