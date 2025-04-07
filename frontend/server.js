@@ -1,6 +1,6 @@
 /**
  * server.js
- * Simple HTTP server for the MibiTech frontend application teste de git
+ * Simple HTTP server for the MibiTech frontend application
  */
 
 const http = require('http');
@@ -34,8 +34,6 @@ const MIME_TYPES = {
 
 // Proxy configuration
 const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
-const http = require('http');
-const https = require('https');
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
