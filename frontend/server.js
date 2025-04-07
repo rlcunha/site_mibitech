@@ -1,6 +1,6 @@
 /**
  * server.js
- * Simple HTTP server for the MibiTech frontend application
+ * Simple HTTP server for the MibiTech frontend application teste de git
  */
 
 const http = require('http');
@@ -31,11 +31,28 @@ const MIME_TYPES = {
     '.wasm': 'application/wasm'  // Add WebAssembly support
 };
 
+// Proxy configuration
+const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
+
 // Create the HTTP server
 const server = http.createServer((req, res) => {
     console.log(`${req.method} ${req.url}`);
     
-    // Parse the URL
+    // Handle API requests
+    if (req.url.startsWith('/api/')) {
+        const apiUrl = `${API_BASE_URL}${req.url}`;
+        console.log(`Proxying to API: ${apiUrl}`);
+        
+        const proxyReq = http.request(apiUrl, (proxyRes) => {
+            res.writeHead(proxyRes.statusCode, proxyRes.headers);
+            proxyRes.pipe(res, { end: true });
+        });
+        
+        req.pipe(proxyReq, { end: true });
+        return;
+    }
+    
+    // Parse the URL for static files
     let filePath = req.url;
     
     // Handle root URL
