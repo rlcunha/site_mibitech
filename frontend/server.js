@@ -33,6 +33,8 @@ const MIME_TYPES = {
 
 // Proxy configuration
 const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
+const http = require('http');
+const https = require('https');
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
@@ -42,6 +44,11 @@ const server = http.createServer((req, res) => {
     if (req.url.startsWith('/api/')) {
         const apiUrl = `${API_BASE_URL}${req.url}`;
         console.log(`Proxying to API: ${apiUrl}`);
+        
+        // Choose http or https module based on API URL
+        const client = apiUrl.startsWith('https://') ? https : http;
+        
+        console.log('Request headers:', req.headers);
         
         const proxyReq = http.request(apiUrl, (proxyRes) => {
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
