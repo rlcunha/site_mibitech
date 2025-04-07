@@ -20,6 +20,8 @@ services:
         - "traefik.http.routers.backend.entrypoints=web,websecure"
         - "traefik.http.routers.backend.priority=100"
         - "traefik.http.routers.backend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+        - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker"
     networks:
       - traefik-public
     restart: always

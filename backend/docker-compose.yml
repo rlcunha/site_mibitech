@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:Mfcd62!!@server.mibitech.com.br:5432/mibitech
+      - DATABASE_URL=postgresql://postgres:Mfcd62!!Mfcd62!!@server.mibitech.com.br:5432/mibitech
       - APP_HOST=0.0.0.0
       - APP_PORT=8000
       - ENVIRONMENT=development
@@ -15,15 +15,19 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`) || (Host(`appteste.mibitech.com.br`) && PathPrefix(`/api`))"
+        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`)"
         - "traefik.http.services.backend.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend.entrypoints=web,websecure"
-        - "traefik.http.routers.backend.priority=100"
+        - "traefik.http.routers.backend-apirest.rule=Host(`apirest.mibitech.com.br`) && PathPrefix(`/api`)"
+        - "traefik.http.services.backend-apirest.loadbalancer.server.port=8000"
+        - "traefik.http.routers.backend-apirest.entrypoints=web,websecure"
         - "traefik.http.routers.backend.tls.certresolver=letsencryptresolver"
+        - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+        - "traefik.http.routers.backend-apirest.middlewares=strip-api-prefix@docker"
     networks:
-      - traefik-public
+      - network_public
     restart: always
 
 networks:
-  traefik-public:
+  network_public:
     external: true
