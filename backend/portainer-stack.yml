@@ -18,6 +18,9 @@ services:
         - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`)"
         - "traefik.http.services.backend.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend.entrypoints=web,websecure"
+        - "traefik.http.routers.backend-appteste.rule=Host(`appteste.mibitech.com.br`) && PathPrefix(`/api`)"
+        - "traefik.http.services.backend-appteste.loadbalancer.server.port=8000"
+        - "traefik.http.routers.backend-appteste.entrypoints=web,websecure"
     networks:
       - public-network
     restart: always
