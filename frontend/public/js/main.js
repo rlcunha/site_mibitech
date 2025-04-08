@@ -5,6 +5,7 @@
 
 // Import controllers
 import CompanyController from '../../controllers/CompanyController.js';
+import ContactController from '../../controllers/ContactController.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("MibiTech application initialized");
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeScrollToTop();
     initializeMobileMenu();
     initializeCompanyInfo();
+    initializeContactInfo();
 });
 
 /**
@@ -27,12 +29,26 @@ function initializeCompanyInfo() {
     try {
         const companyController = new CompanyController();
         companyController.init({
-            contactsContainer: '.contact-info-container',
             socialMediaContainer: '.social-media-container',
             footerSocialContainer: '.footer-social-container'
         });
     } catch (error) {
         console.error("Error initializing company information:", error);
+    }
+}
+
+/**
+ * Initialize contact information from API
+ */
+function initializeContactInfo() {
+    console.log("Initializing contact information");
+    try {
+        const contactController = new ContactController();
+        contactController.init({
+            contactsContainer: '.contact-info-container'
+        });
+    } catch (error) {
+        console.error("Error initializing contact information:", error);
     }
 }
 
@@ -178,10 +194,69 @@ function initializeFAQAccordion() {
 
 /**
  * Contact Form functionality
- * Handles form validation and submission
+ * Handles form validation and submission with enhanced user feedback
  */
 function initializeContactForm() {
     const contactForm = document.getElementById('contactForm');
+    const formInputs = contactForm ? contactForm.querySelectorAll('input, textarea') : [];
+    
+    // Add input validation and visual feedback
+    formInputs.forEach(input => {
+        // Add focus and blur events for visual feedback
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('ring-2', 'ring-blue-200', 'ring-opacity-50');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('ring-2', 'ring-blue-200', 'ring-opacity-50');
+            validateInput(this);
+        });
+        
+        // Add input event for real-time validation
+        input.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateInput(this);
+            }
+        });
+    });
+    
+    // Validate individual input
+    function validateInput(input) {
+        const errorClass = 'error';
+        let isValid = true;
+        
+        // Remove existing error message
+        const existingError = input.parentElement.nextElementSibling;
+        if (existingError && existingError.classList.contains('text-red-500')) {
+            existingError.remove();
+        }
+        
+        // Check validation based on input type
+        if (input.required && !input.value.trim()) {
+            isValid = false;
+            showError(input, 'Este campo é obrigatório');
+        } else if (input.type === 'email' && input.value.trim()) {
+            if (!isValidEmail(input.value.trim())) {
+                isValid = false;
+                showError(input, 'Por favor, insira um e-mail válido');
+            }
+        }
+    }
+    
+    // Show error message for input
+    function showError(input, message) {
+        input.classList.add('error', 'border-red-500');
+        
+        // Create error message element
+        const errorElement = document.createElement('p');
+        errorElement.className = 'text-red-500 text-sm mt-1';
+        errorElement.textContent = message;
+        
+        // Add error message after input's parent element
+        input.parentElement.after(errorElement);
+    }
+    
+    const messageLog = document.getElementById('messageLog');
     
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
@@ -230,29 +305,62 @@ function initializeContactForm() {
             });
             
             if (isValid) {
-                // Simulate form submission
+                // Prepare form data for API
+                const messageData = {
+                    snome: contactForm.querySelector('#name').value,
+                    semail: contactForm.querySelector('#email').value,
+                    stelefone: contactForm.querySelector('#phone').value,
+                    sassunto: contactForm.querySelector('#subject').value,
+                    smensagem: contactForm.querySelector('#message').value
+                };
+                
+                // Get submit button and change its state
                 const submitButton = contactForm.querySelector('button[type="submit"]');
                 const originalText = submitButton.textContent;
                 
                 submitButton.disabled = true;
                 submitButton.textContent = 'Enviando...';
                 
-                // Simulate API call with timeout
-                setTimeout(() => {
-                    // Show success message
-                    contactForm.innerHTML = `
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                            <strong class="font-bold">Mensagem enviada com sucesso!</strong>
-                            <p class="block sm:inline">Agradecemos seu contato. Retornaremos em breve.</p>
-                        </div>
-                    `;
-                    
-                    // Scroll to success message
-                    window.scrollTo({
-                        top: contactForm.offsetTop - 100,
-                        behavior: 'smooth'
+                // Send message using ContactController
+                ContactController.sendMessage(messageData)
+                    .then(response => {
+                        console.log('Mensagem enviada com sucesso:', response);
+                        
+                        // Reset form
+                        contactForm.reset();
+                        
+                        // Show success message
+                        if (messageLog) {
+                            messageLog.innerHTML = '';
+                            const successMsg = document.createElement('div');
+                            successMsg.className = 'bg-green-100 border border-green-400 text-green-700 p-4 rounded';
+                            successMsg.innerHTML = `
+                                <strong class="font-bold">✓ Mensagem enviada com sucesso!</strong>
+                                <p class="text-sm mt-2">Agradecemos seu contato. Retornaremos em breve.</p>
+                            `;
+                            messageLog.appendChild(successMsg);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao enviar mensagem:', error);
+                        
+                        // Show error message
+                        if (messageLog) {
+                            messageLog.innerHTML = '';
+                            const errorMsg = document.createElement('div');
+                            errorMsg.className = 'bg-red-100 border border-red-400 text-red-700 p-4 rounded';
+                            errorMsg.innerHTML = `
+                                <strong class="font-bold">Erro ao enviar mensagem</strong>
+                                <p class="text-sm mt-2">${error.message || 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'}</p>
+                            `;
+                            messageLog.appendChild(errorMsg);
+                        }
+                    })
+                    .finally(() => {
+                        // Re-enable button
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalText;
                     });
-                }, 1500);
             }
         });
         

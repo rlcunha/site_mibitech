@@ -12,7 +12,9 @@ import time
 import os
 from datetime import datetime
 
-from .routes import social_media, webhooks, contact
+from .routes import social_media, webhooks
+from .routes.mensagem.routes import router as mensagem_router
+from .routes.nossocontato.routes import router as nossocontato_router
 from .errors import register_error_handlers, BaseAPIError
 from .helpers import DataProcessor, DateTimeProcessor
 
@@ -82,6 +84,8 @@ register_error_handlers(app)
 app.include_router(social_media.router, prefix="/api/v1/social-media", tags=["social-media"])
 app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["webhooks"])
 # app.include_router(contact.router, prefix="/api", tags=["contact"])
+app.include_router(mensagem_router)
+app.include_router(nossocontato_router)
 
 @app.get("/api/v1/status")
 async def status():

@@ -1,6 +1,6 @@
 /**
  * CompanyController.js
- * Controller for handling company information display
+ * Controller for handling company social media information
  */
 
 import CompanyModel from '../models/CompanyModel.js';
@@ -8,7 +8,6 @@ import CompanyModel from '../models/CompanyModel.js';
 class CompanyController {
     constructor() {
         this.model = new CompanyModel();
-        this.contactsContainer = null;
         this.socialMediaContainer = null;
         this.footerSocialContainer = null;
     }
@@ -16,15 +15,10 @@ class CompanyController {
     /**
      * Initialize the controller
      * @param {Object} options - Configuration options
-     * @param {string} options.contactsContainer - Selector for contacts container
      * @param {string} options.socialMediaContainer - Selector for social media container
      * @param {string} options.footerSocialContainer - Selector for footer social media container
      */
     init(options = {}) {
-        if (options.contactsContainer) {
-            this.contactsContainer = document.querySelector(options.contactsContainer);
-        }
-        
         if (options.socialMediaContainer) {
             this.socialMediaContainer = document.querySelector(options.socialMediaContainer);
         }
@@ -33,44 +27,7 @@ class CompanyController {
             this.footerSocialContainer = document.querySelector(options.footerSocialContainer);
         }
         
-        this.loadData();
-    }
-
-    /**
-     * Load company data from the API
-     */
-    async loadData() {
-        try {
-            console.log('Loading company data...');
-            // Load contacts and social media in parallel
-            await Promise.all([
-                this.loadContacts(),
-                this.loadSocialMedia()
-            ]);
-            console.log('Company data loaded successfully');
-        } catch (error) {
-            console.error('Error loading company data:', error);
-        }
-    }
-
-    /**
-     * Load contact information
-     */
-    async loadContacts() {
-        if (!this.contactsContainer) {
-            console.warn('Contact container not found');
-            return;
-        }
-        
-        try {
-            console.log('Loading contacts...');
-            const contacts = await this.model.fetchContacts();
-            console.log('Rendering contacts:', contacts);
-            this.renderContacts(contacts);
-        } catch (error) {
-            console.error('Error loading contacts:', error);
-            this.renderContactsError();
-        }
+        this.loadSocialMedia();
     }
 
     /**
@@ -106,40 +63,6 @@ class CompanyController {
                 this.renderSocialMediaError(this.footerSocialContainer);
             }
         }
-    }
-
-    /**
-     * Render contacts in the container
-     * @param {Array} contacts - Array of contact objects
-     */
-    renderContacts(contacts) {
-        if (!this.contactsContainer) {
-            console.warn('Contact container not found for rendering');
-            return;
-        }
-        
-        if (!contacts || contacts.length === 0) {
-            console.warn('No contacts data to render');
-            return;
-        }
-        
-        console.log('Rendering contacts:', contacts);
-        
-        // Clear the container
-        this.contactsContainer.innerHTML = '';
-        
-        // Create contact elements
-        contacts.forEach(contact => {
-            const contactElement = document.createElement('div');
-            contactElement.className = 'contact-info mb-6';
-            contactElement.innerHTML = `
-                <h3 class="text-xl font-bold mb-2">${contact.name}</h3>
-                <p class="mb-1"><i class="fas fa-envelope mr-2"></i> ${contact.email}</p>
-                <p class="mb-1"><i class="fas fa-phone mr-2"></i> ${contact.phone}</p>
-                <p class="mb-1"><i class="fas fa-map-marker-alt mr-2"></i> ${contact.address}</p>
-            `;
-            this.contactsContainer.appendChild(contactElement);
-        });
     }
 
     /**
@@ -196,19 +119,6 @@ class CompanyController {
             socialElement.innerHTML = `<i class="${social.icon}"></i>`;
             container.appendChild(socialElement);
         });
-    }
-
-    /**
-     * Render error message for contacts
-     */
-    renderContactsError() {
-        if (!this.contactsContainer) return;
-        
-        this.contactsContainer.innerHTML = `
-            <div class="error-message">
-                <p>Não foi possível carregar as informações de contato. Por favor, tente novamente mais tarde.</p>
-            </div>
-        `;
     }
 
     /**

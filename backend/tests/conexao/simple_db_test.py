@@ -28,12 +28,15 @@ def test_connection():
         # Carrega variáveis de ambiente
         load_dotenv()
         
-        # Obtém parâmetros de conexão do ambiente ou usa valores padrão
-        db_host = os.getenv("DB_HOST", "server.mibitech.com.br")
-        db_port = os.getenv("DB_PORT", "5432")
-        db_name = os.getenv("POSTGRES_DB", "postgres")
-        db_user = os.getenv("POSTGRES_USER", "postgres")
-        db_password = os.getenv("POSTGRES_PASSWORD", "Mfcd62!!Mfcd62!!")
+        # Obtém parâmetros de conexão do ambiente
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_name = os.getenv("POSTGRES_DB")
+        db_user = os.getenv("POSTGRES_USER")
+        db_password = os.getenv("POSTGRES_PASSWORD")
+        
+        if not all([db_host, db_port, db_name, db_user, db_password]):
+            self.skipTest("Database connection environment variables not set")
         
         # Constrói string de conexão
         conn_string = f"host={db_host} port={db_port} dbname={db_name} user={db_user} password={db_password}"

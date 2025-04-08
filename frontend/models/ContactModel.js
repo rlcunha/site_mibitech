@@ -1,156 +1,99 @@
-/**
- * ContactModel.js
- * Model for handling contact form data and submissions
- */
+import FRONTEND_CONFIG from '../public/js/config.js';
 
-import DataModel from './DataModel.js';
-
-class ContactModel extends DataModel {
+export default class ContactModel {
     constructor() {
-        super();
-        this.formData = {
-            name: '',
-            email: '',
-            phone: '',
-            company: '',
-            subject: '',
-            message: '',
-            privacy: false
-        };
-        this.formErrors = {};
-        this.submitStatus = null; // 'success', 'error', or null
+        this.contacts = [];
+        this.isLoading = false;
+        this.error = null;
     }
 
-    /**
-     * Set a form field value
-     * @param {string} field - The field name
-     * @param {string|boolean} value - The field value
-     */
-    setField(field, value) {
-        if (field in this.formData) {
-            this.formData[field] = value;
-        }
-    }
-
-    /**
-     * Get the current form data
-     * @returns {Object} - The current form data
-     */
-    getFormData() {
-        return this.formData;
-    }
-
-    /**
-     * Validate the form data
-     * @returns {boolean} - True if valid, false otherwise
-     */
-    validateForm() {
-        this.formErrors = {};
-        let isValid = true;
-
-        // Validate name
-        if (!this.formData.name.trim()) {
-            this.formErrors.name = 'Nome é obrigatório';
-            isValid = false;
-        }
-
-        // Validate email
-        if (!this.formData.email.trim()) {
-            this.formErrors.email = 'E-mail é obrigatório';
-            isValid = false;
-        } else if (!this.isValidEmail(this.formData.email)) {
-            this.formErrors.email = 'E-mail inválido';
-            isValid = false;
-        }
-
-        // Validate subject
-        if (!this.formData.subject.trim()) {
-            this.formErrors.subject = 'Assunto é obrigatório';
-            isValid = false;
-        }
-
-        // Validate message
-        if (!this.formData.message.trim()) {
-            this.formErrors.message = 'Mensagem é obrigatória';
-            isValid = false;
-        }
-
-        // Validate privacy checkbox
-        if (!this.formData.privacy) {
-            this.formErrors.privacy = 'Você deve concordar com a política de privacidade';
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    /**
-     * Get the current form errors
-     * @returns {Object} - The current form errors
-     */
-    getFormErrors() {
-        return this.formErrors;
-    }
-
-    /**
-     * Submit the contact form
-     * @returns {Promise} - Promise resolving to the submission result
-     */
-    async submitForm() {
-        if (!this.validateForm()) {
-            this.submitStatus = 'error';
-            return { success: false, errors: this.formErrors };
-        }
+    async fetchContacts() {
+        this.isLoading = true;
+        this.error = null;
 
         try {
-            // Use the API endpoint
-            const response = await this.postData('https://apirest.mibitech.com.br/api/submit-contact/', this.formData);
-            
-            this.submitStatus = 'success';
-            return response;
+            console.log('Fetching contacts from API...');
+            const apiUrl = window.location.hostname === 'localhost'
+                ? 'http://localhost:8000/api/v1/nossocontato/'
+                : '/api/v1/nossocontato/';
+            console.log('Using contacts API URL:', apiUrl);
+            const response = await fetch(apiUrl, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            console.log('Contacts data received:', data);
+            // Mapeia os campos da API para o formato esperado pelo frontend
+            this.contacts = data.map(item => ({
+                slocal: item.local,
+                stelefone: item.telefone,
+                semail: item.email
+            }));
+            return data;
         } catch (error) {
-            this.submitStatus = 'error';
-            return {
-                success: false,
-                message: 'Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.'
-            };
+            this.error = error.message;
+            console.error('Error fetching contacts:', error);
+            throw error;
+        } finally {
+            this.isLoading = false;
         }
     }
 
     /**
-     * Get the current submission status
-     * @returns {string|null} - The current submission status
+     * Get the current contacts data
+     * @returns {Array|null} - The current contacts data
      */
-    getSubmitStatus() {
-        return this.submitStatus;
+    getContacts() {
+        return this.contacts;
     }
 
     /**
-     * Reset the form data and errors
+     * Get a specific contact by ID
+     * @param {number} id - The contact ID
+     * @returns {Object|null} - The contact object or null if not found
      */
-    resetForm() {
-        this.formData = {
-            name: '',
-            email: '',
-            phone: '',
-            company: '',
-            subject: '',
-            message: '',
-            privacy: false
-        };
-        this.formErrors = {};
-        this.submitStatus = null;
+    getContactById(id) {
+        if (!this.contacts) return null;
+        return this.contacts.find(contact => contact.id === id) || null;
     }
 
-    /**
-     * Helper method to validate email format
-     * @param {string} email - The email to validate
-     * @returns {boolean} - True if valid, false otherwise
-     */
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+    static async sendMessage(messageData) {
+        try {
+            const apiUrl = `${FRONTEND_CONFIG.API_BASE_URL}/api/v1/mensagem/`;
+            console.log('Sending message to:', apiUrl);
+            
+            // Ensure all required fields are included
+            const completeMessageData = {
+                snome: messageData.snome || '',
+                semail: messageData.semail,
+                stelefone: messageData.stelefone,
+                sassunto: messageData.sassunto,
+                smensagem: messageData.smensagem
+            };
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(completeMessageData)
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Erro ao enviar mensagem (${response.status})`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error sending message:', error);
+            throw error;
+        }
     }
 }
-
-export default ContactModel;

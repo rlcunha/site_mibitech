@@ -31,15 +31,15 @@ const MIME_TYPES = {
     '.otf': 'font/otf',
     '.wasm': 'application/wasm'  // Add WebAssembly support
 };
-
+//TODO: Ajustar para produção.
 // Proxy configuration
-const API_BASE_URL = 'http://apirest.mibitech.com.br:8000';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
     // API request handling (no logging)
     // Handle API requests
-    if (req.url.startsWith('/api/')) {
+    if (req.url.startsWith('/api/') || req.url.startsWith('/api/v1/')) {
         const apiUrl = `${API_BASE_URL}${req.url}`;
         // Proxying API request (no logging)
         

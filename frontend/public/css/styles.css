@@ -242,6 +242,37 @@ body {
     opacity: 1;
 }
 
+/* Contact Info Container Styles */
+.contact-info-container {
+    position: relative;
+    z-index: 1000;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.contact-info-container .space-y-8 > * + * {
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1001;
+}
+
+.contact-info-container > div {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.contact-info-container > div:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
 /* Custom Gradient Text */
 .gradient-text {
     background: linear-gradient(90deg, #3b82f6, #8b5cf6);

@@ -52,9 +52,9 @@ mibitech/
    ```
 
 3. Access the application:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000/api/
-   - Admin panel: http://localhost:8000/admin/
+   - Frontend: http://localhost:3000 (configurável via FRONTEND_PORT)
+   - Backend API: Configurável via API_BASE_URL
+   - Admin panel: Configurável via BACKEND_ADMIN_URL
 
 ## Deployment to a VPS
 

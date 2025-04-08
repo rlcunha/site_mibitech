@@ -1,290 +1,147 @@
-/**
- * ContactController.js
- * Controller for handling contact form interactions
- */
-
 import ContactModel from '../models/ContactModel.js';
 
-class ContactController {
+export default class ContactController {
     constructor() {
         this.model = new ContactModel();
-        this.form = null;
-        this.formElements = {};
-        this.submitButton = null;
-        this.formContainer = null;
-        this.successMessage = null;
-        this.errorMessage = null;
-        
-        // Bind methods to this instance
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleInput = this.handleInput.bind(this);
+        this.contactContainer = null;
+        this.messageLog = null;
     }
 
     /**
      * Initialize the controller
-     * @param {string} formId - The ID of the contact form
+     * @param {Object} options - Configuration options
+     * @param {string} options.contactContainer - Selector for contact info container
+     * @param {string} options.messageLog - Selector for message log container
      */
-    init(formId = 'contactForm') {
-        // Get form elements
-        this.form = document.getElementById(formId);
-        
-        if (!this.form) {
-            console.error(`Contact form with ID "${formId}" not found.`);
-            return;
+    init(options = {}) {
+        if (options.contactContainer || options.contactsContainer) {
+            this.contactContainer = document.querySelector(options.contactContainer || options.contactsContainer);
         }
         
-        this.formContainer = this.form.parentElement;
-        
-        // Get form input elements
-        this.formElements = {
-            name: this.form.querySelector('#name'),
-            email: this.form.querySelector('#email'),
-            phone: this.form.querySelector('#phone'),
-            company: this.form.querySelector('#company'),
-            subject: this.form.querySelector('#subject'),
-            message: this.form.querySelector('#message'),
-            privacy: this.form.querySelector('#privacy')
-        };
-        
-        this.submitButton = this.form.querySelector('button[type="submit"]');
-        
-        // Create success and error message elements
-        this.createMessageElements();
-        
-        // Add event listeners
-        this.form.addEventListener('submit', this.handleSubmit);
-        
-        // Add input event listeners to form elements
-        Object.entries(this.formElements).forEach(([field, element]) => {
-            if (element) {
-                if (field === 'privacy') {
-                    element.addEventListener('change', () => this.handleInput(field, element.checked));
-                } else {
-                    element.addEventListener('input', () => this.handleInput(field, element.value));
-                }
-            }
-        });
+        if (options.messageLog) {
+            this.messageLog = document.querySelector(options.messageLog);
+        }
+
+        if (this.contactContainer) {
+            this.loadContacts();
+        }
     }
 
     /**
-     * Create success and error message elements
+     * Load contacts from API
      */
-    createMessageElements() {
-        // Create success message element
-        this.successMessage = document.createElement('div');
-        this.successMessage.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 hidden';
-        this.successMessage.setAttribute('role', 'alert');
-        this.successMessage.innerHTML = `
-            <strong class="font-bold">Mensagem enviada com sucesso!</strong>
-            <p class="block sm:inline">Agradecemos seu contato. Retornaremos em breve.</p>
-        `;
-        
-        // Create error message element
-        this.errorMessage = document.createElement('div');
-        this.errorMessage.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 hidden';
-        this.errorMessage.setAttribute('role', 'alert');
-        this.errorMessage.innerHTML = `
-            <strong class="font-bold">Erro ao enviar mensagem!</strong>
-            <p class="block sm:inline">Por favor, verifique os campos e tente novamente.</p>
-        `;
-        
-        // Insert messages before the form
-        this.formContainer.insertBefore(this.successMessage, this.form);
-        this.formContainer.insertBefore(this.errorMessage, this.form);
-    }
-
-    /**
-     * Handle form submission
-     * @param {Event} event - The submit event
-     */
-    async handleSubmit(event) {
-        event.preventDefault();
-        
-        // Update model with form data
-        Object.entries(this.formElements).forEach(([field, element]) => {
-            if (element) {
-                const value = field === 'privacy' ? element.checked : element.value;
-                this.model.setField(field, value);
-            }
-        });
-        
-        // Validate form
-        if (!this.model.validateForm()) {
-            this.displayErrors();
-            this.showErrorMessage('Por favor, corrija os erros no formulário.');
+    async loadContacts() {
+        if (!this.contactContainer) {
+            console.warn('Contact container not found');
             return;
         }
-        
-        // Disable submit button and show loading state
-        this.setSubmitButtonLoading(true);
-        
+
         try {
-            // Submit form
-            const result = await this.model.submitForm();
-            
-            if (result.success) {
-                this.showSuccessMessage(result.message);
-                this.resetForm();
-            } else {
-                this.showErrorMessage(result.message);
-            }
+            console.log('Loading contacts...');
+            const contacts = await this.model.fetchContacts();
+            console.log('Contacts loaded:', contacts);
+            this.renderContacts(contacts);
         } catch (error) {
-            this.showErrorMessage('Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.');
-            console.error('Error submitting form:', error);
-        } finally {
-            this.setSubmitButtonLoading(false);
+            console.error('Error loading contacts:', error);
+            this.renderContactsError(error);
         }
     }
 
     /**
-     * Handle input changes
-     * @param {string} field - The field name
-     * @param {string|boolean} value - The field value
+     * Render contacts in the container
+     * @param {Array} contacts - Array of contact objects
      */
-    handleInput(field, value) {
-        // Update model with the new value
-        this.model.setField(field, value);
-        
-        // Clear error for this field
-        this.clearFieldError(field);
-        
-        // Hide error message
-        this.hideErrorMessage();
-    }
+    renderContacts(contacts) {
+        if (!this.contactContainer) {
+            console.warn('Contact container not found for rendering');
+            return;
+        }
 
-    /**
-     * Display form validation errors
-     */
-    displayErrors() {
-        const errors = this.model.getFormErrors();
+        if (!contacts || contacts.length === 0) {
+            console.warn('No contacts data to render');
+            this.contactContainer.innerHTML = '<p class="text-gray-500">Nenhum contato disponível</p>';
+            return;
+        }
+
+        console.log('Rendering contacts:', contacts);
         
-        Object.entries(errors).forEach(([field, errorMessage]) => {
-            const element = this.formElements[field];
+        // Criar um container para todos os contatos em layout horizontal
+        let contactsHTML = '<div class="flex flex-wrap gap-4 justify-center">';
+        
+        // Iterar sobre todos os contatos
+        contacts.forEach(contact => {
+            // Verificar se estamos usando os dados mapeados do modelo ou os dados brutos da API
+            const local = contact.slocal || contact.local || 'Não informado';
+            const telefone = contact.stelefone || contact.telefone || 'Não informado';
+            const email = contact.semail || contact.email || 'Não informado';
+            const titulo = contact.stipo || contact.tipo || 'Contato';
             
-            if (element) {
-                // Add error class to the element
-                element.classList.add('border-red-500');
-                
-                // Add error message
-                let errorElement = element.nextElementSibling;
-                
-                if (!errorElement || !errorElement.classList.contains('error-message')) {
-                    errorElement = document.createElement('p');
-                    errorElement.className = 'error-message text-red-500 text-sm mt-1';
-                    element.parentNode.insertBefore(errorElement, element.nextSibling);
-                }
-                
-                errorElement.textContent = errorMessage;
-            }
+            // Adicionar o card de contato ao HTML com estilos modernos
+            contactsHTML += `
+                <div class="contact-info-card p-6 space-y-4 flex-shrink-0" style="min-width: 280px; max-width: 350px;">
+                    <h3 class="text-xl font-bold text-blue-700 mb-4">${titulo}</h3>
+                    <div class="flex items-start space-x-4">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Endereço</h4>
+                            <p class="text-gray-600">${local}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Telefone</h4>
+                            <p class="text-gray-600">${telefone}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-800">E-mail</h4>
+                            <p class="text-gray-600">${email}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         });
+        
+        // Fechar o container
+        contactsHTML += '</div>';
+        
+        // Atualizar o HTML do container
+        this.contactContainer.innerHTML = contactsHTML;
+        console.log('Contact info rendered successfully');
     }
 
     /**
-     * Clear error for a specific field
-     * @param {string} field - The field name
+     * Render error message for contacts
+     * @param {Error} error - Error object
      */
-    clearFieldError(field) {
-        const element = this.formElements[field];
+    renderContactsError(error) {
+        if (!this.contactContainer) return;
         
-        if (element) {
-            // Remove error class
-            element.classList.remove('border-red-500');
-            
-            // Remove error message
-            const errorElement = element.nextElementSibling;
-            
-            if (errorElement && errorElement.classList.contains('error-message')) {
-                errorElement.remove();
-            }
+        this.contactContainer.innerHTML = `
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <p>Não foi possível carregar as informações de contato</p>
+                ${error.message ? `<p class="text-sm mt-1">${error.message}</p>` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Send message through API
+     * @param {Object} messageData - Message data
+     * @returns {Promise} Promise with the result
+     */
+    static async sendMessage(messageData) {
+        try {
+            console.log('Sending message with data:', messageData);
+            const result = await ContactModel.sendMessage(messageData);
+            console.log('Message sent successfully:', result);
+            return result;
+        } catch (error) {
+            console.error('Error sending message:', error);
+            throw error;
         }
-    }
-
-    /**
-     * Show success message
-     * @param {string} message - The success message
-     */
-    showSuccessMessage(message) {
-        // Hide error message
-        this.hideErrorMessage();
-        
-        // Update success message text if provided
-        if (message) {
-            const messageElement = this.successMessage.querySelector('p');
-            
-            if (messageElement) {
-                messageElement.textContent = message;
-            }
-        }
-        
-        // Show success message
-        this.successMessage.classList.remove('hidden');
-        
-        // Hide form
-        this.form.classList.add('hidden');
-        
-        // Scroll to success message
-        this.successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    /**
-     * Show error message
-     * @param {string} message - The error message
-     */
-    showErrorMessage(message) {
-        // Update error message text if provided
-        if (message) {
-            const messageElement = this.errorMessage.querySelector('p');
-            
-            if (messageElement) {
-                messageElement.textContent = message;
-            }
-        }
-        
-        // Show error message
-        this.errorMessage.classList.remove('hidden');
-        
-        // Scroll to error message
-        this.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    /**
-     * Hide error message
-     */
-    hideErrorMessage() {
-        this.errorMessage.classList.add('hidden');
-    }
-
-    /**
-     * Set submit button loading state
-     * @param {boolean} isLoading - Whether the button is in loading state
-     */
-    setSubmitButtonLoading(isLoading) {
-        if (this.submitButton) {
-            if (isLoading) {
-                this.submitButton.disabled = true;
-                this.submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
-            } else {
-                this.submitButton.disabled = false;
-                this.submitButton.innerHTML = 'Enviar Mensagem';
-            }
-        }
-    }
-
-    /**
-     * Reset the form
-     */
-    resetForm() {
-        // Reset model
-        this.model.resetForm();
-        
-        // Reset form element
-        this.form.reset();
-        
-        // Clear all field errors
-        Object.keys(this.formElements).forEach(field => {
-            this.clearFieldError(field);
-        });
     }
 }
-
-export default ContactController;

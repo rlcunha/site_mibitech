@@ -34,8 +34,10 @@ def test_connection():
         # Carrega variáveis de ambiente
         load_dotenv()
         
-        # Obtém a URL de conexão do ambiente ou usa o valor padrão
-        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Mfcd62!!Mfcd62!!@server.mibitech.com.br:5432/mibitech")
+        # Obtém a URL de conexão do ambiente
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        if not DATABASE_URL:
+            self.skipTest("DATABASE_URL environment variable not set")
         
         logger.info(f"Tentando conectar ao banco de dados: {DATABASE_URL}")
         

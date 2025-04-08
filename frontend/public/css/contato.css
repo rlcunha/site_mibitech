@@ -1,0 +1,235 @@
+/* Estilos modernos para a página de contato */
+
+/* Variáveis de cores */
+:root {
+    --primary-color: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-dark: #1e3a8a;
+    --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    --accent-color: #38bdf8;
+    --text-dark: #1f2937;
+    --text-light: #f9fafb;
+    --bg-light: #f0f9ff;
+    --bg-dark: #0f172a;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+}
+
+/* Estilos gerais da página de contato */
+.contact-page-container {
+    background-color: var(--bg-light);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+/* Estilização do título da página */
+.contact-hero {
+    background-image: var(--primary-gradient);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,133.3C672,139,768,181,864,197.3C960,213,1056,203,1152,170.7C1248,139,1344,85,1392,58.7L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.contact-hero h1 {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.contact-hero p {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Formulário de contato */
+.contact-form-container {
+    border-radius: 1rem;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilização dos inputs */
+.contact-input {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background-color: #f9fafb;
+}
+
+.contact-input:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    background-color: white;
+}
+
+.contact-input:hover {
+    border-color: #d1d5db;
+}
+
+.contact-input.error {
+    border-color: var(--error);
+}
+
+.contact-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+.contact-input:focus + .contact-label,
+.contact-input:not(:placeholder-shown) + .contact-label {
+    color: var(--primary-color);
+}
+
+/* Botão de envio */
+.contact-submit-btn {
+    background-image: var(--primary-gradient);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.contact-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+    transition: all 0.6s ease;
+    z-index: -1;
+}
+
+.contact-submit-btn:hover::before {
+    left: 100%;
+}
+
+.contact-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+}
+
+/* Cards de informações de contato */
+.contact-info-card {
+    border-radius: 1rem;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--primary-light);
+    overflow: hidden;
+}
+
+.contact-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info-card h3 {
+    color: var(--primary-color);
+    font-weight: 700;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 0.75rem;
+}
+
+.contact-info-card i {
+    background-color: var(--bg-light);
+    color: var(--primary-color);
+    padding: 0.75rem;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.contact-info-card:hover i {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.contact-info-card h4 {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* Seção do mapa */
+.map-container {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 4px solid white;
+    transition: all 0.3s ease;
+}
+
+.map-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .contact-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .contact-hero p {
+        font-size: 1rem;
+    }
+    
+    .contact-form-container,
+    .contact-info-card {
+        margin-bottom: 1.5rem;
+    }
+}

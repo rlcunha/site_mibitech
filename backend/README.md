@@ -88,11 +88,11 @@ docker-compose up -d --build
 
 ## Banco de Dados
 
-A API se conecta a um servidor PostgreSQL existente com as seguintes credenciais:
-- Servidor: server.mibitech.com.br
-- Banco de dados: mibitech
-- Usuário: postgres
-- Senha: Mfcd62!!
+A API se conecta a um servidor PostgreSQL. Configure as seguintes variáveis de ambiente:
+- DATABASE_URL: URL completa de conexão com o banco de dados
+- POSTGRES_USER: Usuário do banco de dados
+- POSTGRES_PASSWORD: Senha do banco de dados
+- POSTGRES_DB: Nome do banco de dados
 
 Os dados iniciais de mídias sociais são automaticamente inseridos na primeira execução.
 
