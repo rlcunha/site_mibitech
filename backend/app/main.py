@@ -35,6 +35,28 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
+# Adiciona rotas alternativas para documentação
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.responses import HTMLResponse
+
+@app.get("/v1/api/docs", include_in_schema=False)
+async def get_alternative_docs():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - Swagger UI",
+        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+        swagger_js_url="/api/v1/docs/swagger-ui-bundle.js",
+        swagger_css_url="/api/v1/docs/swagger-ui.css",
+    )
+
+@app.get("/v1/api/redoc", include_in_schema=False)
+async def get_alternative_redoc():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - ReDoc",
+        redoc_js_url="/api/v1/docs/redoc.standalone.js",
+    )
+
 # Configuração CORS
 app.add_middleware(
     CORSMiddleware,
