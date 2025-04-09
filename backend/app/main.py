@@ -109,11 +109,6 @@ async def status():
             "version": app.version,
             "environment": os.getenv("ENVIRONMENT", "development")
         }
-        
-        # Valida usando o processador de dados
-        processor = DataProcessor()
-        if not processor.validate(status_data):
-            raise ValueError("Dados de status inválidos")
             
         return status_data
         

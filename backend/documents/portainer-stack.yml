@@ -15,13 +15,19 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`) && PathPrefix(`/api`)"
+        - "traefik.http.routers.backend.rule=Host(`apirest.mibitech.com.br`)"
         - "traefik.http.services.backend.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend.entrypoints=web,websecure"
-        - "traefik.http.routers.backend.priority=100"
+        - "traefik.http.routers.backend-api.rule=Host(`apirest.mibitech.com.br`) && PathPrefix(`/api`)"
+        - "traefik.http.services.backend-api.loadbalancer.server.port=8000"
+        - "traefik.http.routers.backend-api.entrypoints=web,websecure"
+        - "traefik.http.middlewares.backend-api-headers.headers.customrequestheaders.X-Forwarded-Prefix=/api"
+        - "traefik.http.routers.backend-api.middlewares=backend-api-headers@docker"
         - "traefik.http.routers.backend.tls.certresolver=letsencryptresolver"
-        - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
-        - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker"
+        - "traefik.http.routers.backend-api.tls.certresolver=letsencryptresolver"
+        # Removendo o middleware que remove o prefixo /api, pois a aplicação espera esse prefixo
+        # - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+        # - "traefik.http.routers.backend-api.middlewares=strip-api-prefix@docker"
     networks:
       - network_public
     restart: always
