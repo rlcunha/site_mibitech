@@ -1,4 +1,4 @@
-\"""
+"""
 Middlewares personalizados para a aplicação FastAPI.
 
 Este módulo contém middlewares adicionais para lidar com requisições HTTP.
