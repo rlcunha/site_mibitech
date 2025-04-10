@@ -119,6 +119,9 @@ async def get_alternative_redoc():
         logger.error(f"[DEBUG-404] Erro ao gerar documentação ReDoc: {str(e)}")
         raise e
 
+# Importa o middleware personalizado para requisições inválidas
+from .middleware import InvalidRequestMiddleware
+
 # Configuração CORS
 app.add_middleware(
     CORSMiddleware,
@@ -127,6 +130,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Adiciona middleware para capturar requisições inválidas
+app.add_middleware(InvalidRequestMiddleware)
 
 # Middleware para logging de requisições
 @app.middleware("http")
@@ -143,39 +149,78 @@ async def log_requests(request: Request, call_next):
     """
     start_time = time.time()
     
-    # Registra informações detalhadas da requisição para debug do erro 404
-    logger.info(f"[DEBUG-404] Requisição iniciada: {request.method} {request.url.path}")
-    logger.info(f"[DEBUG-404] URL completa: {request.url}")
-    logger.info(f"[DEBUG-404] Base URL: {request.base_url}")
-    logger.info(f"[DEBUG-404] Headers: {dict(request.headers)}")
-    
-    # Log para endpoints de documentação
-    if '/api/v1/docs' in request.url.path or '/api/v1/redoc' in request.url.path or '/api/v1/openapi.json' in request.url.path:
-        logger.info(f"[DEBUG-404] Tentativa de acesso à documentação: {request.url.path}")
-        logger.info(f"[DEBUG-404] Query params: {request.query_params}")
-        logger.info(f"[DEBUG-404] Path params: {request.path_params}")
-    
-    # Processa a requisição
-    response = await call_next(request)
-    
-    # Calcula duração
-    process_time = (time.time() - start_time) * 1000
-    response.headers["X-Process-Time"] = f"{process_time:.2f}ms"
-    
-    # Registra conclusão com informações detalhadas
-    logger.info(
-        f"[DEBUG-404] Requisição concluída: {request.method} {request.url.path} "
-        f"(Status: {response.status_code}, Tempo: {process_time:.2f}ms)"
-    )
-    
-    # Log adicional para respostas 404
-    if response.status_code == 404:
-        logger.warning(
-            f"[DEBUG-404] ERRO 404 DETECTADO: {request.method} {request.url.path} - "
-            f"Headers: {dict(request.headers)}"
-        )
-    
-    return response
+    try:
+        # Registra informações detalhadas da requisição para debug do erro 404
+        logger.info(f"[DEBUG-404] Requisição iniciada: {request.method} {request.url.path}")
+        logger.info(f"[DEBUG-404] URL completa: {request.url}")
+        logger.info(f"[DEBUG-404] Base URL: {request.base_url}")
+        logger.info(f"[DEBUG-404] Headers: {dict(request.headers)}")
+        logger.info(f"[DEBUG-404] Client host: {request.client.host if request.client else 'N/A'}")
+        logger.info(f"[DEBUG-404] Client port: {request.client.port if request.client else 'N/A'}")
+        
+        # Log para endpoints de documentação
+        if '/api/v1/docs' in request.url.path or '/api/v1/redoc' in request.url.path or '/api/v1/openapi.json' in request.url.path:
+            logger.info(f"[DEBUG-404] Tentativa de acesso à documentação: {request.url.path}")
+            logger.info(f"[DEBUG-404] Query params: {request.query_params}")
+            logger.info(f"[DEBUG-404] Path params: {request.path_params}")
+        
+        # Tenta capturar o corpo da requisição para requisições não-GET
+        if request.method != "GET":
+            try:
+                body_bytes = await request.body()
+                if body_bytes:
+                    try:
+                        # Tenta decodificar como JSON
+                        body_str = body_bytes.decode('utf-8')
+                        logger.info(f"[DEBUG-404] Corpo da requisição: {body_str[:500]}" + 
+                                   ("..." if len(body_str) > 500 else ""))
+                    except UnicodeDecodeError:
+                        # Se não for texto, registra como binário
+                        logger.info(f"[DEBUG-404] Corpo da requisição (binário): {len(body_bytes)} bytes")
+            except Exception as e:
+                logger.warning(f"[DEBUG-404] Erro ao capturar corpo da requisição: {str(e)}")
+        
+        # Processa a requisição
+        try:
+            response = await call_next(request)
+            
+            # Calcula duração
+            process_time = (time.time() - start_time) * 1000
+            response.headers["X-Process-Time"] = f"{process_time:.2f}ms"
+            
+            # Registra conclusão com informações detalhadas
+            logger.info(
+                f"[DEBUG-404] Requisição concluída: {request.method} {request.url.path} "
+                f"(Status: {response.status_code}, Tempo: {process_time:.2f}ms)"
+            )
+            
+            # Log adicional para respostas 404
+            if response.status_code == 404:
+                logger.warning(
+                    f"[DEBUG-404] ERRO 404 DETECTADO: {request.method} {request.url.path} - "
+                    f"Headers: {dict(request.headers)}"
+                )
+            
+            return response
+        except Exception as e:
+            # Captura exceções durante o processamento da requisição
+            logger.error(f"[DEBUG-404] Erro durante processamento da requisição: {str(e)}")
+            raise e
+            
+    except Exception as e:
+        # Captura exceções durante o middleware
+        logger.error(f"[DEBUG-404] Erro no middleware de logging: {str(e)}")
+        # Registra a stack trace para depuração
+        import traceback
+        logger.error(f"[DEBUG-404] Stack trace: {traceback.format_exc()}")
+        
+        # Se ocorrer um erro no middleware, ainda precisamos processar a requisição
+        try:
+            response = await call_next(request)
+            return response
+        except Exception as inner_e:
+            logger.error(f"[DEBUG-404] Erro secundário no middleware: {str(inner_e)}")
+            raise inner_e
 
 # Registra manipuladores de erro
 register_error_handlers(app)
