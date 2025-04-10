@@ -21,6 +21,23 @@ class InvalidRequestMiddleware(BaseHTTPMiddleware):
     erros no processamento normal da aplicação.
     """
     
+    def __init__(self, app):
+        super().__init__(app)
+        logger.info(f"[DOCKER-DEBUG] Middleware InvalidRequestMiddleware inicializado")
+        # Registra informações do ambiente
+        import os
+        import socket
+        try:
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+            logger.info(f"[DOCKER-DEBUG] Hostname: {hostname}")
+            logger.info(f"[DOCKER-DEBUG] IP: {ip_address}")
+            logger.info(f"[DOCKER-DEBUG] Ambiente: {os.getenv('ENVIRONMENT', 'development')}")
+            logger.info(f"[DOCKER-DEBUG] APP_HOST: {os.getenv('APP_HOST', '127.0.0.1')}")
+            logger.info(f"[DOCKER-DEBUG] APP_PORT: {os.getenv('APP_PORT', '8000')}")
+        except Exception as e:
+            logger.error(f"[DOCKER-DEBUG] Erro ao obter informações do sistema: {str(e)}")
+    
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """
         Processa a requisição e captura detalhes sobre requisições inválidas.
@@ -32,6 +49,24 @@ class InvalidRequestMiddleware(BaseHTTPMiddleware):
         Returns:
             Resposta da requisição
         """
+        # Log adicional para ambiente Docker
+        if '/api/v1/docs' in request.url.path or '/api/v1/redoc' in request.url.path or '/api/v1/openapi.json' in request.url.path:
+            logger.info(f"[DOCKER-DEBUG] Tentativa de acesso à documentação via middleware: {request.url.path}")
+            logger.info(f"[DOCKER-DEBUG] URL completa: {request.url}")
+            logger.info(f"[DOCKER-DEBUG] Headers de proxy: {[h for h in request.headers.items() if 'forwarded' in h[0].lower() or 'proxy' in h[0].lower()]}")
+            
+            # Verifica se há cabeçalhos de proxy que podem estar afetando o roteamento
+            x_forwarded_host = request.headers.get('x-forwarded-host')
+            x_forwarded_proto = request.headers.get('x-forwarded-proto')
+            x_forwarded_prefix = request.headers.get('x-forwarded-prefix')
+            
+            if x_forwarded_host:
+                logger.info(f"[DOCKER-DEBUG] X-Forwarded-Host detectado: {x_forwarded_host}")
+            if x_forwarded_proto:
+                logger.info(f"[DOCKER-DEBUG] X-Forwarded-Proto detectado: {x_forwarded_proto}")
+            if x_forwarded_prefix:
+                logger.info(f"[DOCKER-DEBUG] X-Forwarded-Prefix detectado: {x_forwarded_prefix}")
+                logger.warning(f"[DOCKER-DEBUG] Prefixo encaminhado pode estar afetando o roteamento da documentação!")
         try:
             # Tenta processar a requisição normalmente
             response = await call_next(request)

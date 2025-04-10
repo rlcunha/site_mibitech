@@ -35,6 +35,15 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json"
 )
 
+# Log de configuração da aplicação no startup
+logger.info(f"[DOCKER-DEBUG] Iniciando aplicação FastAPI")
+logger.info(f"[DOCKER-DEBUG] Ambiente: {os.getenv('ENVIRONMENT', 'development')}")
+logger.info(f"[DOCKER-DEBUG] Host: {os.getenv('APP_HOST', '127.0.0.1')}")
+logger.info(f"[DOCKER-DEBUG] Porta: {os.getenv('APP_PORT', '8000')}")
+logger.info(f"[DOCKER-DEBUG] docs_url: {app.docs_url}")
+logger.info(f"[DOCKER-DEBUG] redoc_url: {app.redoc_url}")
+logger.info(f"[DOCKER-DEBUG] openapi_url: {app.openapi_url}")
+
 # Adiciona rotas alternativas para documentação
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import HTMLResponse
@@ -225,12 +234,18 @@ async def log_requests(request: Request, call_next):
 # Registra manipuladores de erro
 register_error_handlers(app)
 
+# Importa rotas de diagnóstico
+from .routes import diagnostics
+
 # Inclui rotas
 app.include_router(social_media.router, prefix="/api/v1/social-media", tags=["social-media"])
 app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["webhooks"])
 # app.include_router(contact.router, prefix="/api", tags=["contact"])
 app.include_router(mensagem_router)
 app.include_router(nossocontato_router)
+
+# Inclui rotas de diagnóstico para ambiente de produção
+app.include_router(diagnostics.router, prefix="/api/v1/diagnostics", tags=["diagnostics"])
 
 @app.get("/api/v1/status")
 async def status():
