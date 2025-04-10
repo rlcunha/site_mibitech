@@ -41,21 +41,83 @@ from fastapi.responses import HTMLResponse
 
 @app.get("/api/v1/docs", include_in_schema=False)
 async def get_alternative_docs():
-    return get_swagger_ui_html(
-        openapi_url=app.openapi_url,
-        title=f"{app.title} - Swagger UI",
-        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-        swagger_js_url="/api/v1/docs/swagger-ui-bundle.js",
-        swagger_css_url="/api/v1/docs/swagger-ui.css",
-    )
+    logger.info(f"[DEBUG-404] Acessando documentação Swagger UI")
+    logger.info(f"[DEBUG-404] OpenAPI URL: {app.openapi_url}")
+    logger.info(f"[DEBUG-404] OAuth2 Redirect URL: {app.swagger_ui_oauth2_redirect_url}")
+    
+    try:
+        # Usando URLs absolutas do CDN para evitar problemas de roteamento
+        docs = get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=f"{app.title} - Swagger UI",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
+            swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
+        )
+        logger.info(f"[DEBUG-404] Documentação Swagger UI gerada com sucesso")
+        return docs
+    except Exception as e:
+        logger.error(f"[DEBUG-404] Erro ao gerar documentação Swagger UI: {str(e)}")
+        raise e
+
+# Endpoints para servir os arquivos estáticos da documentação Swagger
+@app.get("/api/v1/docs/swagger-ui-bundle.js", include_in_schema=False)
+async def swagger_ui_bundle():
+    logger.info(f"[DEBUG-404] Requisição para arquivo swagger-ui-bundle.js")
+    try:
+        # Fallback para CDN
+        return JSONResponse(
+            {"redirect": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"},
+            headers={"Location": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"},
+            status_code=302
+        )
+    except Exception as e:
+        logger.error(f"[DEBUG-404] Erro ao servir swagger-ui-bundle.js: {str(e)}")
+        raise e
+
+@app.get("/api/v1/docs/swagger-ui.css", include_in_schema=False)
+async def swagger_ui_css():
+    logger.info(f"[DEBUG-404] Requisição para arquivo swagger-ui.css")
+    try:
+        # Fallback para CDN
+        return JSONResponse(
+            {"redirect": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css"},
+            headers={"Location": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css"},
+            status_code=302
+        )
+    except Exception as e:
+        logger.error(f"[DEBUG-404] Erro ao servir swagger-ui.css: {str(e)}")
+        raise e
+
+@app.get("/api/v1/docs/redoc.standalone.js", include_in_schema=False)
+async def redoc_standalone():
+    logger.info(f"[DEBUG-404] Requisição para arquivo redoc.standalone.js")
+    try:
+        # Fallback para CDN
+        return JSONResponse(
+            {"redirect": "https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.js"},
+            headers={"Location": "https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.js"},
+            status_code=302
+        )
+    except Exception as e:
+        logger.error(f"[DEBUG-404] Erro ao servir redoc.standalone.js: {str(e)}")
+        raise e
 
 @app.get("/api/v1/redoc", include_in_schema=False)
 async def get_alternative_redoc():
-    return get_redoc_html(
-        openapi_url=app.openapi_url,
-        title=f"{app.title} - ReDoc",
-        redoc_js_url="/api/v1/docs/redoc.standalone.js",
-    )
+    logger.info(f"[DEBUG-404] Acessando documentação ReDoc")
+    try:
+        # Usando URL absoluta do CDN para evitar problemas de roteamento
+        docs = get_redoc_html(
+            openapi_url=app.openapi_url,
+            title=f"{app.title} - ReDoc",
+            redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.js",
+        )
+        logger.info(f"[DEBUG-404] Documentação ReDoc gerada com sucesso")
+        return docs
+    except Exception as e:
+        logger.error(f"[DEBUG-404] Erro ao gerar documentação ReDoc: {str(e)}")
+        raise e
 
 # Configuração CORS
 app.add_middleware(
@@ -81,8 +143,17 @@ async def log_requests(request: Request, call_next):
     """
     start_time = time.time()
     
-    # Registra início da requisição
-    logger.info(f"Requisição iniciada: {request.method} {request.url.path}")
+    # Registra informações detalhadas da requisição para debug do erro 404
+    logger.info(f"[DEBUG-404] Requisição iniciada: {request.method} {request.url.path}")
+    logger.info(f"[DEBUG-404] URL completa: {request.url}")
+    logger.info(f"[DEBUG-404] Base URL: {request.base_url}")
+    logger.info(f"[DEBUG-404] Headers: {dict(request.headers)}")
+    
+    # Log para endpoints de documentação
+    if '/api/v1/docs' in request.url.path or '/api/v1/redoc' in request.url.path or '/api/v1/openapi.json' in request.url.path:
+        logger.info(f"[DEBUG-404] Tentativa de acesso à documentação: {request.url.path}")
+        logger.info(f"[DEBUG-404] Query params: {request.query_params}")
+        logger.info(f"[DEBUG-404] Path params: {request.path_params}")
     
     # Processa a requisição
     response = await call_next(request)
@@ -91,11 +162,18 @@ async def log_requests(request: Request, call_next):
     process_time = (time.time() - start_time) * 1000
     response.headers["X-Process-Time"] = f"{process_time:.2f}ms"
     
-    # Registra conclusão
+    # Registra conclusão com informações detalhadas
     logger.info(
-        f"Requisição concluída: {request.method} {request.url.path} "
+        f"[DEBUG-404] Requisição concluída: {request.method} {request.url.path} "
         f"(Status: {response.status_code}, Tempo: {process_time:.2f}ms)"
     )
+    
+    # Log adicional para respostas 404
+    if response.status_code == 404:
+        logger.warning(
+            f"[DEBUG-404] ERRO 404 DETECTADO: {request.method} {request.url.path} - "
+            f"Headers: {dict(request.headers)}"
+        )
     
     return response
 
