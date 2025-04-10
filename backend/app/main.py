@@ -39,7 +39,7 @@ app = FastAPI(
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import HTMLResponse
 
-@app.get("/v1/api/docs", include_in_schema=False)
+@app.get("/api/v1/docs", include_in_schema=False)
 async def get_alternative_docs():
     return get_swagger_ui_html(
         openapi_url=app.openapi_url,
@@ -49,7 +49,7 @@ async def get_alternative_docs():
         swagger_css_url="/api/v1/docs/swagger-ui.css",
     )
 
-@app.get("/v1/api/redoc", include_in_schema=False)
+@app.get("/api/v1/redoc", include_in_schema=False)
 async def get_alternative_redoc():
     return get_redoc_html(
         openapi_url=app.openapi_url,
