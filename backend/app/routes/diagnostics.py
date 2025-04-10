@@ -1,4 +1,4 @@
-\"""Rotas de diagnóstico para depuração do ambiente Docker.
+"""Rotas de diagnóstico para depuração do ambiente Docker.
 
 Este módulo fornece endpoints para verificar a configuração do ambiente
 e ajudar na depuração de problemas em produção.
