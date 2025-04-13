@@ -247,6 +247,10 @@ app.include_router(nossocontato_router)
 # Inclui rotas de diagnóstico para ambiente de produção
 app.include_router(diagnostics.router, prefix="/api/v1/diagnostics", tags=["diagnostics"])
 
+# Inclui rotas de diagnóstico específicas para documentação
+from .routes import diagnostics_docs
+app.include_router(diagnostics_docs.router, prefix="/api/v1/diagnostics", tags=["diagnostics"])
+
 @app.get("/api/v1/status")
 async def status():
     """
