@@ -17,7 +17,15 @@ const __dirname = dirname(__filename);
 // Define the port to use
 const PORT = process.env.PORT || 3000;
 
-// MIME types for different file extensions
+// Health check endpoint
+const server = http.createServer((req, res) => {
+    if (req.url === '/health') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
+    // MIME types for different file extensions
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
