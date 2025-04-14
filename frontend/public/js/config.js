@@ -1,11 +1,23 @@
-// Frontend configuration
+/**
+ * Configurações do frontend
+ * 
+ * A URL base da API pode ser configurada de 3 formas (por ordem de prioridade):
+ * 1. Através da variável de ambiente API_BASE_URL
+ * 2. Através da meta tag <meta name="app-config" content='{"API_BASE_URL":"..."}'>
+ * 3. Usando valores padrão baseados no ambiente (desenvolvimento/produção)
+ */
 const FRONTEND_CONFIG = {
-    API_BASE_URL: window.location.hostname === 'localhost'
-        ? window.APP_CONFIG?.API_BASE_URL || 'http://localhost:8000'
-        : '/api'
+    /**
+     * URL base da API
+     * @type {string}
+     */
+    API_BASE_URL: window.APP_CONFIG?.API_BASE_URL
+        || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8000'
+            : 'https://apirest.mibitech.com.br')
 };
 
-// Load config from meta tag if available
+// Carrega configurações adicionais da meta tag se disponível
 const configMeta = document.querySelector('meta[name="app-config"]');
 if (configMeta) {
     try {

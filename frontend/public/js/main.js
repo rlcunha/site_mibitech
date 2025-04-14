@@ -3,53 +3,91 @@
  * This file contains all the interactive functionality for the MibiTech website
  */
 
-// Import controllers
-import CompanyController from '../../controllers/CompanyController.js';
-import ContactController from '../../controllers/ContactController.js';
+// Import controllers with error handling
+let CompanyController, ContactController;
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("MibiTech application initialized");
-    // Initialize all components
-    initializeNavigation();
-    initializeAnimations();
-    initializePortfolioFilter();
-    initializeFAQAccordion();
-    initializeContactForm();
-    initializeScrollToTop();
-    initializeMobileMenu();
-    initializeCompanyInfo();
-    initializeContactInfo();
-});
+try {
+    CompanyController = (await import('../../controllers/CompanyController.js')).default;
+    ContactController = (await import('../../controllers/ContactController.js')).default;
+    // Controllers imported
+} catch (error) {
+    console.error('Failed to import controllers:', error);
+    // Fallback to empty classes if imports fail
+    CompanyController = class {};
+    ContactController = class {};
+}
 
-/**
- * Initialize company information from API
- */
-function initializeCompanyInfo() {
-    console.log("Initializing company information");
+// Check if DOM is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
+}
+
+// Handle both DOMContentLoaded and already loaded cases
+async function initializeApp() {
+    // Application initialized
+    
     try {
+        // Verify containers exist before initialization (using IDs)
+        const contactContainer = document.getElementById('contactInfoContainer');
+        const socialContainer = document.getElementById('socialMediaContainer');
+        
+        if (!contactContainer || !socialContainer) {
+            throw new Error('Required containers not found');
+        }
+        
+        // Initialize controllers
+        // Creating controller instances
+        const contactController = new ContactController();
         const companyController = new CompanyController();
-        companyController.init({
-            socialMediaContainer: '.social-media-container',
-            footerSocialContainer: '.footer-social-container'
-        });
+        
+        // Initialize all components
+        initializeNavigation();
+        initializeAnimations();
+        initializePortfolioFilter();
+        initializeFAQAccordion();
+        initializeScrollToTop();
+        initializeMobileMenu();
+        
+        // Initialize controllers with proper selectors
+        // Social media container initialized
+        if (typeof companyController.init === 'function') {
+            companyController.init({
+                socialMediaContainer: '#socialMediaContainer',
+                footerSocialContainer: '#footerSocialContainer'
+            });
+        }
+        
+        console.log('Contato container inicializado');
+        if (typeof contactController.init === 'function') {
+            contactController.init({
+                contactContainer: '#contactInfoContainer',
+                messageForm: '#contactForm',
+                messageLog: '#messageLog'
+            });
+        }
+        
+        // Load data
+        if (typeof contactController.loadContacts === 'function') {
+            await contactController.loadContacts();
+        }
+        
+        if (typeof companyController.loadSocialMedia === 'function') {
+            await companyController.loadSocialMedia();
+        }
+        
+        // Application initialized successfully
     } catch (error) {
-        console.error("Error initializing company information:", error);
+        console.error('Application initialization failed:', error);
     }
 }
 
-/**
- * Initialize contact information from API
- */
-function initializeContactInfo() {
-    console.log("Initializing contact information");
-    try {
-        const contactController = new ContactController();
-        contactController.init({
-            contactsContainer: '.contact-info-container'
-        });
-    } catch (error) {
-        console.error("Error initializing contact information:", error);
-    }
+// Check if DOM is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
 }
 
 /**
@@ -192,193 +230,6 @@ function initializeFAQAccordion() {
     }
 }
 
-/**
- * Contact Form functionality
- * Handles form validation and submission with enhanced user feedback
- */
-function initializeContactForm() {
-    const contactForm = document.getElementById('contactForm');
-    const formInputs = contactForm ? contactForm.querySelectorAll('input, textarea') : [];
-    
-    // Add input validation and visual feedback
-    formInputs.forEach(input => {
-        // Add focus and blur events for visual feedback
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('ring-2', 'ring-blue-200', 'ring-opacity-50');
-        });
-        
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('ring-2', 'ring-blue-200', 'ring-opacity-50');
-            validateInput(this);
-        });
-        
-        // Add input event for real-time validation
-        input.addEventListener('input', function() {
-            if (this.classList.contains('error')) {
-                validateInput(this);
-            }
-        });
-    });
-    
-    // Validate individual input
-    function validateInput(input) {
-        const errorClass = 'error';
-        let isValid = true;
-        
-        // Remove existing error message
-        const existingError = input.parentElement.nextElementSibling;
-        if (existingError && existingError.classList.contains('text-red-500')) {
-            existingError.remove();
-        }
-        
-        // Check validation based on input type
-        if (input.required && !input.value.trim()) {
-            isValid = false;
-            showError(input, 'Este campo é obrigatório');
-        } else if (input.type === 'email' && input.value.trim()) {
-            if (!isValidEmail(input.value.trim())) {
-                isValid = false;
-                showError(input, 'Por favor, insira um e-mail válido');
-            }
-        }
-    }
-    
-    // Show error message for input
-    function showError(input, message) {
-        input.classList.add('error', 'border-red-500');
-        
-        // Create error message element
-        const errorElement = document.createElement('p');
-        errorElement.className = 'text-red-500 text-sm mt-1';
-        errorElement.textContent = message;
-        
-        // Add error message after input's parent element
-        input.parentElement.after(errorElement);
-    }
-    
-    const messageLog = document.getElementById('messageLog');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Basic form validation
-            let isValid = true;
-            const requiredFields = contactForm.querySelectorAll('[required]');
-            
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    field.classList.add('border-red-500');
-                    
-                    // Add error message if it doesn't exist
-                    let errorMessage = field.nextElementSibling;
-                    if (!errorMessage || !errorMessage.classList.contains('error-message')) {
-                        errorMessage = document.createElement('p');
-                        errorMessage.classList.add('error-message', 'text-red-500', 'text-sm', 'mt-1');
-                        errorMessage.textContent = 'Este campo é obrigatório';
-                        field.parentNode.insertBefore(errorMessage, field.nextSibling);
-                    }
-                } else {
-                    field.classList.remove('border-red-500');
-                    
-                    // Remove error message if it exists
-                    const errorMessage = field.nextElementSibling;
-                    if (errorMessage && errorMessage.classList.contains('error-message')) {
-                        errorMessage.remove();
-                    }
-                    
-                    // Email validation
-                    if (field.type === 'email' && !isValidEmail(field.value)) {
-                        isValid = false;
-                        field.classList.add('border-red-500');
-                        
-                        let errorMessage = field.nextElementSibling;
-                        if (!errorMessage || !errorMessage.classList.contains('error-message')) {
-                            errorMessage = document.createElement('p');
-                            errorMessage.classList.add('error-message', 'text-red-500', 'text-sm', 'mt-1');
-                            errorMessage.textContent = 'Por favor, insira um e-mail válido';
-                            field.parentNode.insertBefore(errorMessage, field.nextSibling);
-                        }
-                    }
-                }
-            });
-            
-            if (isValid) {
-                // Prepare form data for API
-                const messageData = {
-                    snome: contactForm.querySelector('#name').value,
-                    semail: contactForm.querySelector('#email').value,
-                    stelefone: contactForm.querySelector('#phone').value,
-                    sassunto: contactForm.querySelector('#subject').value,
-                    smensagem: contactForm.querySelector('#message').value
-                };
-                
-                // Get submit button and change its state
-                const submitButton = contactForm.querySelector('button[type="submit"]');
-                const originalText = submitButton.textContent;
-                
-                submitButton.disabled = true;
-                submitButton.textContent = 'Enviando...';
-                
-                // Send message using ContactController
-                ContactController.sendMessage(messageData)
-                    .then(response => {
-                        console.log('Mensagem enviada com sucesso:', response);
-                        
-                        // Reset form
-                        contactForm.reset();
-                        
-                        // Show success message
-                        if (messageLog) {
-                            messageLog.innerHTML = '';
-                            const successMsg = document.createElement('div');
-                            successMsg.className = 'bg-green-100 border border-green-400 text-green-700 p-4 rounded';
-                            successMsg.innerHTML = `
-                                <strong class="font-bold">✓ Mensagem enviada com sucesso!</strong>
-                                <p class="text-sm mt-2">Agradecemos seu contato. Retornaremos em breve.</p>
-                            `;
-                            messageLog.appendChild(successMsg);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro ao enviar mensagem:', error);
-                        
-                        // Show error message
-                        if (messageLog) {
-                            messageLog.innerHTML = '';
-                            const errorMsg = document.createElement('div');
-                            errorMsg.className = 'bg-red-100 border border-red-400 text-red-700 p-4 rounded';
-                            errorMsg.innerHTML = `
-                                <strong class="font-bold">Erro ao enviar mensagem</strong>
-                                <p class="text-sm mt-2">${error.message || 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'}</p>
-                            `;
-                            messageLog.appendChild(errorMsg);
-                        }
-                    })
-                    .finally(() => {
-                        // Re-enable button
-                        submitButton.disabled = false;
-                        submitButton.textContent = originalText;
-                    });
-            }
-        });
-        
-        // Remove validation styling on input
-        const formInputs = contactForm.querySelectorAll('input, textarea');
-        formInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                this.classList.remove('border-red-500');
-                
-                // Remove error message if it exists
-                const errorMessage = this.nextElementSibling;
-                if (errorMessage && errorMessage.classList.contains('error-message')) {
-                    errorMessage.remove();
-                }
-            });
-        });
-    }
-}
 
 /**
  * Scroll to Top functionality

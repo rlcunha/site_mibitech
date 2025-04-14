@@ -1,4 +1,4 @@
-\"""Rotas de diagnóstico específicas para a documentação da API.
+"""Rotas de diagnóstico específicas para a documentação da API.
 
 Este módulo fornece endpoints para verificar a configuração da documentação
 e ajudar na depuração de problemas de acesso à documentação da API.

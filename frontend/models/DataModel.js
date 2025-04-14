@@ -3,6 +3,15 @@
  * Base model class for handling data operations
  */
 
+let config;
+try {
+    // Try to load test config first
+    config = (await import('../tests/config.test.js')).default;
+} catch {
+    // Fallback to regular config
+    config = (await import('../public/js/config.js')).default;
+}
+
 class DataModel {
     constructor() {
         this.data = null;
@@ -11,14 +20,27 @@ class DataModel {
     }
 
     /**
+     * Build full API URL from endpoint path
+     * @param {string} endpoint - API endpoint path (e.g. '/companies')
+     * @returns {string} Full API URL
+     */
+    buildApiUrl(endpoint) {
+        // Remove leading/trailing slashes for consistency
+        const cleanEndpoint = endpoint.replace(/^\/|\/$/g, '');
+        return `${config.API_BASE_URL}/${cleanEndpoint}`;
+    }
+
+    /**
      * Fetch data from an API endpoint
-     * @param {string} url - The API endpoint URL
+     * @param {string} endpoint - The API endpoint path (e.g. '/companies')
      * @param {Object} options - Fetch options
      * @returns {Promise} - Promise resolving to the fetched data
      */
-    async fetchData(url, options = {}) {
+    async fetchData(endpoint, options = {}) {
         this.isLoading = true;
         this.error = null;
+
+        const url = this.buildApiUrl(endpoint);
 
         try {
             console.log(`Fetching data from: ${url}`);
@@ -53,14 +75,16 @@ class DataModel {
 
     /**
      * Post data to an API endpoint
-     * @param {string} url - The API endpoint URL
+     * @param {string} endpoint - The API endpoint path (e.g. '/companies')
      * @param {Object} data - The data to post
      * @param {Object} options - Additional fetch options
      * @returns {Promise} - Promise resolving to the response data
      */
-    async postData(url, data, options = {}) {
+    async postData(endpoint, data, options = {}) {
         this.isLoading = true;
         this.error = null;
+
+        const url = this.buildApiUrl(endpoint);
 
         try {
             const response = await fetch(url, {
@@ -86,52 +110,6 @@ class DataModel {
         } finally {
             this.isLoading = false;
         }
-    }
-
-    /**
-     * Get the current data
-     * @returns {Object} - The current data
-     */
-    getData() {
-        return this.data;
-    }
-
-    /**
-     * Get the current error
-     * @returns {string|null} - The current error message or null
-     */
-    getError() {
-        return this.error;
-    }
-
-    /**
-     * Check if data is currently loading
-     * @returns {boolean} - True if data is loading, false otherwise
-     */
-    getIsLoading() {
-        return this.isLoading;
-    }
-
-    /**
-     * Set data manually
-     * @param {Object} data - The data to set
-     */
-    setData(data) {
-        this.data = data;
-    }
-
-    /**
-     * Clear the current data
-     */
-    clearData() {
-        this.data = null;
-    }
-
-    /**
-     * Clear the current error
-     */
-    clearError() {
-        this.error = null;
     }
 }
 

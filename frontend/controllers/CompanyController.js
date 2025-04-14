@@ -82,6 +82,7 @@ class CompanyController {
         }
         
         console.log('Rendering social media:', socialMedia);
+        console.log('Container found:', container);
         
         // Clear the container
         container.innerHTML = '';
@@ -93,9 +94,13 @@ class CompanyController {
             socialElement.target = '_blank';
             socialElement.rel = 'noopener noreferrer';
             socialElement.className = 'social-icon bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 hover:bg-blue-700 transition-colors';
-            socialElement.innerHTML = `<i class="${social.icon}"></i>`;
+            socialElement.innerHTML = `<i class="${social.icon || 'fab fa-' + social.name.toLowerCase()}"></i>`;
             container.appendChild(socialElement);
+            console.log('Added social media element:', social.name);
         });
+        
+        // Verificar se os elementos foram adicionados
+        console.log('Social media container after rendering:', container.innerHTML);
     }
 
     /**

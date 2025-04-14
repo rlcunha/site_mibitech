@@ -3,10 +3,16 @@
  * Simple HTTP server for the MibiTech frontend application
  */
 
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Define the port to use
 const PORT = process.env.PORT || 3000;
@@ -15,8 +21,8 @@ const PORT = process.env.PORT || 3000;
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
-    '.js': 'application/javascript',  // Updated to modern MIME type
-    '.mjs': 'application/javascript', // Add support for module files
+    '.js': 'application/javascript',
+    '.mjs': 'application/javascript',
     '.json': 'application/json',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
@@ -29,26 +35,21 @@ const MIME_TYPES = {
     '.woff2': 'font/woff2',
     '.eot': 'application/vnd.ms-fontobject',
     '.otf': 'font/otf',
-    '.wasm': 'application/wasm'  // Add WebAssembly support
+    '.wasm': 'application/wasm'
 };
-//TODO: Ajustar para produção.
+
 // Proxy configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
-// Create the HTTP server
+// Create the HTTP server with logging disabled
 const server = http.createServer((req, res) => {
-    // API request handling (no logging)
+    // Disable request logging
     // Handle API requests
     if (req.url.startsWith('/api/') || req.url.startsWith('/api/v1/')) {
         const apiUrl = `${API_BASE_URL}${req.url}`;
-        // Proxying API request (no logging)
-        
-        // Choose http or https module based on API URL
         const client = apiUrl.startsWith('https://') ? https : http;
         
-        // Request headers processing (no logging)
-        
-        const proxyReq = http.request(apiUrl, (proxyRes) => {
+        const proxyReq = client.request(apiUrl, (proxyRes) => {
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
             proxyRes.pipe(res, { end: true });
         });
@@ -65,32 +66,24 @@ const server = http.createServer((req, res) => {
         filePath = '/index.html';
     }
     
-    // Resolve the file path
-    // Handle path traversal safely
+    // Resolve the file path safely
     filePath = path.join(__dirname, ...filePath.split('/').filter(p => !p.includes('..')));
     
-    // Get the file extension
+    // Get the file extension and MIME type
     const extname = path.extname(filePath).toLowerCase();
-    
-    // Get the MIME type
     const contentType = MIME_TYPES[extname] || 'application/octet-stream';
     
     // Read the file
     fs.readFile(filePath, (err, content) => {
+        // Only log errors
         if (err) {
-            // If the file doesn't exist, check if it exists in the views directory
             if (err.code === 'ENOENT') {
-                // Only fallback for HTML requests
                 if (extname === '.html') {
-                    // Extract the filename from the path
                     const filename = path.basename(filePath);
-                    
-                    // Check if the file exists in the views directory
                     const viewsFilePath = path.join(__dirname, 'views', filename);
                     
                     fs.readFile(viewsFilePath, (viewsErr, viewsContent) => {
                         if (viewsErr) {
-                            // If not found in views either, fallback to index.html
                             fs.readFile(path.join(__dirname, 'views', 'index.html'), (indexErr, indexContent) => {
                                 if (indexErr) {
                                     res.writeHead(404, { 'Content-Type': 'text/html' });
@@ -98,41 +91,40 @@ const server = http.createServer((req, res) => {
                                     return;
                                 }
                                 
-                                // Serve index.html
                                 res.writeHead(200, { 'Content-Type': 'text/html' });
                                 res.end(indexContent, 'utf-8');
                             });
                         } else {
-                            // Serve the file from views directory
                             res.writeHead(200, { 'Content-Type': 'text/html' });
                             res.end(viewsContent, 'utf-8');
                         }
                     });
                 } else {
-                    // Not an HTML file, return 404
                     res.writeHead(404);
                     res.end(`File not found: ${req.url}`);
                 }
             } else {
-                // Server error
                 res.writeHead(500);
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            // Serve the file
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(content, 'utf-8');
         }
     });
 });
 
-// Start the server (listen on all interfaces)
+// Start the server
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running at http://0.0.0.0:${PORT}/`);
-    console.log(`Press Ctrl+C to stop the server`);
+    console.log(`\n=== SERVER STARTED ===`);
+    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Press Ctrl+C to stop the server\n`);
     
     // Add CORS headers for development
     server.on('request', (req, res) => {
+        // Log all requests
+        // console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+        
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

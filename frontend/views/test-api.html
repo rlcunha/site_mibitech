@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-config" content='{"API_BASE_URL":"http://localhost:8000"}'>
+    <title>Teste API - MibiTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-blue-600 mb-8">Teste de API MibiTech</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Contatos</h2>
+            <div id="contactContainer" class="contact-info-container border border-gray-200 rounded-lg p-4 min-h-32">
+                <p>Carregando contatos...</p>
+            </div>
+            <button id="reloadContacts" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Recarregar Contatos
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Redes Sociais</h2>
+            <div id="socialContainer" class="social-media-container border border-gray-200 rounded-lg p-4 min-h-32">
+                <p>Carregando redes sociais...</p>
+            </div>
+            <button id="reloadSocial" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Recarregar Redes Sociais
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4">Logs</h2>
+            <div id="logContainer" class="border border-gray-200 rounded-lg p-4 h-64 overflow-y-auto font-mono text-sm bg-gray-50"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import ContactController from '../controllers/ContactController.js';
+        import CompanyController from '../controllers/CompanyController.js';
+        
+        const logContainer = document.getElementById('logContainer');
+        const log = (message) => {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'mb-2';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+
+        // Initialize controllers
+        const contactController = new ContactController();
+        const companyController = new CompanyController();
+
+        contactController.init({
+            contactContainer: '#contactContainer',
+            messageLog: '#logContainer'
+        });
+
+        companyController.init({
+            socialMediaContainer: '#socialContainer',
+            footerSocialContainer: '#logContainer'
+        });
+
+        // Add reload buttons functionality
+        document.getElementById('reloadContacts').addEventListener('click', () => {
+            log('Recarregando contatos...');
+            contactController.loadContacts();
+        });
+
+        document.getElementById('reloadSocial').addEventListener('click', () => {
+            log('Recarregando redes sociais...');
+            companyController.loadSocialMedia();
+        });
+
+        log('Aplicação de teste inicializada');
+    </script>
+</body>
+</html>

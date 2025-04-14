@@ -20,14 +20,7 @@ class CompanyModel extends DataModel {
         this.error = null;
 
         try {
-            console.log('Fetching social media from API...');
-            const apiUrl = window.location.hostname === 'localhost'
-                ? 'http://localhost:8000/api/v1/social-media/'
-                : '/api/v1/social-media/';
-            console.log('Using API URL:', apiUrl);
-            
-            const data = await this.fetchData(apiUrl);
-            console.log('Social media data received:', data);
+            const data = await this.fetchData('api/v1/social-media');
             
             if (!data || !Array.isArray(data)) {
                 throw new Error('Dados inválidos recebidos da API');
@@ -37,25 +30,20 @@ class CompanyModel extends DataModel {
             return data;
         } catch (error) {
             this.error = `Erro ao buscar redes sociais: ${error.message}`;
-            console.error('Error details:', {
-                message: error.message,
-                stack: error.stack,
-                url: 'http://localhost:8000/api/v1/social-media/'
-            });
-            //TODO: ajustar
+            console.error('Error fetching social media:', error);
             throw error;
         } finally {
             this.isLoading = false;
         }
     }
-/**
- * Get the current social media data
- * @returns {Array|null} - The current social media data
- */
-getSocialMedia() {
-    return this.socialMedia;
-}
 
+    /**
+     * Get the current social media data
+     * @returns {Array|null} - The current social media data
+     */
+    getSocialMedia() {
+        return this.socialMedia;
+    }
 
     /**
      * Get a specific social media by ID

@@ -323,12 +323,15 @@ class App {
         console.log('Initializing contact page');
         
         // Initialize contact form controller
-        this.contactController.init('contactForm');
+        this.contactController.init({
+            contactContainer: '.contact-info-container',
+            messageForm: '#contactForm',
+            messageLog: '#messageLog'
+        });
         
         // Initialize company information (contacts and social media)
         const companyController = new CompanyController();
         companyController.init({
-            contactsContainer: '.contact-info-container',
             socialMediaContainer: '.social-media-container',
             footerSocialContainer: '.footer-social-container'
         });

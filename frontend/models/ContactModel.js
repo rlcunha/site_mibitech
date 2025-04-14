@@ -1,10 +1,9 @@
-import FRONTEND_CONFIG from '../public/js/config.js';
+import DataModel from './DataModel.js';
 
-export default class ContactModel {
+export default class ContactModel extends DataModel {
     constructor() {
+        super();
         this.contacts = [];
-        this.isLoading = false;
-        this.error = null;
     }
 
     async fetchContacts() {
@@ -13,25 +12,27 @@ export default class ContactModel {
 
         try {
             console.log('Fetching contacts from API...');
-            const apiUrl = window.location.hostname === 'localhost'
-                ? 'http://localhost:8000/api/v1/nossocontato/'
-                : '/api/v1/nossocontato/';
-            console.log('Using contacts API URL:', apiUrl);
-            const response = await fetch(apiUrl, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            if (!response.ok) throw new Error('Network response was not ok');
-            const data = await response.json();
-            console.log('Contacts data received:', data);
+            const data = await this.fetchData('api/v1/nossocontato');
+            console.log('API response:', data);
+            
+            if (!Array.isArray(data)) {
+                console.error('Invalid API response format - expected array');
+                throw new Error('Invalid response format from API');
+            }
+
             // Mapeia os campos da API para o formato esperado pelo frontend
             this.contacts = data.map(item => ({
-                slocal: item.local,
-                stelefone: item.telefone,
-                semail: item.email
+                id: item.id,
+                stipo: item.tipo || 'Contato',
+                slocal: item.local || 'Não informado',
+                stelefone: item.telefone || 'Não informado',
+                semail: item.email || 'Não informado',
+                created_at: item.created_at,
+                updated_at: item.updated_at
             }));
-            return data;
+
+            console.log('Mapped contacts:', this.contacts);
+            return this.contacts;
         } catch (error) {
             this.error = error.message;
             console.error('Error fetching contacts:', error);
@@ -41,30 +42,20 @@ export default class ContactModel {
         }
     }
 
-    /**
-     * Get the current contacts data
-     * @returns {Array|null} - The current contacts data
-     */
     getContacts() {
         return this.contacts;
     }
 
-    /**
-     * Get a specific contact by ID
-     * @param {number} id - The contact ID
-     * @returns {Object|null} - The contact object or null if not found
-     */
     getContactById(id) {
         if (!this.contacts) return null;
         return this.contacts.find(contact => contact.id === id) || null;
     }
 
-    static async sendMessage(messageData) {
+    async sendMessage(messageData) {
+        this.isLoading = true;
+        this.error = null;
+
         try {
-            const apiUrl = `${FRONTEND_CONFIG.API_BASE_URL}/api/v1/mensagem/`;
-            console.log('Sending message to:', apiUrl);
-            
-            // Ensure all required fields are included
             const completeMessageData = {
                 snome: messageData.snome || '',
                 semail: messageData.semail,
@@ -73,27 +64,14 @@ export default class ContactModel {
                 smensagem: messageData.smensagem
             };
             
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(completeMessageData)
-            });
-            
-            console.log('Response status:', response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response:', errorText);
-                throw new Error(`Erro ao enviar mensagem (${response.status})`);
-            }
-            
-            return await response.json();
+            const response = await this.postData('api/v1/mensagem', completeMessageData);
+            return response;
         } catch (error) {
+            this.error = error.message;
             console.error('Error sending message:', error);
             throw error;
+        } finally {
+            this.isLoading = false;
         }
     }
 }
