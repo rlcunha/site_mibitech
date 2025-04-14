@@ -17,15 +17,7 @@ const __dirname = dirname(__filename);
 // Define the port to use
 const PORT = process.env.PORT || 3000;
 
-// Health check endpoint
-const server = http.createServer((req, res) => {
-    if (req.url === '/health') {
-        res.writeHead(200);
-        res.end();
-        return;
-    }
-
-    // MIME types for different file extensions
+// MIME types for different file extensions
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
@@ -49,9 +41,15 @@ const MIME_TYPES = {
 // Proxy configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
-// Create the HTTP server with logging disabled
+// Create the HTTP server
 const server = http.createServer((req, res) => {
-    // Disable request logging
+    // Health check endpoint
+    if (req.url === '/health') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
+
     // Handle API requests
     if (req.url.startsWith('/api/') || req.url.startsWith('/api/v1/')) {
         const apiUrl = `${API_BASE_URL}${req.url}`;
@@ -83,7 +81,6 @@ const server = http.createServer((req, res) => {
     
     // Read the file
     fs.readFile(filePath, (err, content) => {
-        // Only log errors
         if (err) {
             if (err.code === 'ENOENT') {
                 if (extname === '.html') {
@@ -130,9 +127,6 @@ server.listen(PORT, '0.0.0.0', () => {
     
     // Add CORS headers for development
     server.on('request', (req, res) => {
-        // Log all requests
-        // console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-        
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
