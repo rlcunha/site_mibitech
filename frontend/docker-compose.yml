@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   frontend:
-    image: mibitech-frontend:latest
+    # image: mibitech-frontend:latest
+    build: .
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
     deploy:
       replicas: 1
       labels:
@@ -14,6 +18,7 @@ services:
         - "traefik.http.routers.mibitech-frontend.priority=10"
     networks:
       - traefik-public
+    restart: unless-stopped
 
 networks:
   traefik-public:
