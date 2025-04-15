@@ -14,7 +14,7 @@ const FRONTEND_CONFIG = {
     API_BASE_URL: window.APP_CONFIG?.API_BASE_URL
         || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8000'
-            : 'https://apirest.mibitech.com.br')
+            : 'http://apirest.mibitech.com.br:8000')
 };
 
 // Carrega configurações adicionais da meta tag se disponível

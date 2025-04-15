@@ -20,9 +20,9 @@ COPY --from=builder /app/controllers ./controllers
 COPY --from=builder /app/models ./models
 COPY --from=builder /app/server.js ./
 
-# Health check
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f https://appteste.mibitech.com.br/health || exit 1
+# # Health check
+# HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+#   CMD curl -f https://appteste.mibitech.com.br/health || exit 1
 
 EXPOSE 3000
 CMD ["node", "server.js"]
