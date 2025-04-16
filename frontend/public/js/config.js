@@ -29,9 +29,9 @@ const FRONTEND_CONFIG = {
     VERSION: window.ENV?.VERSION || '1.0.0'
 };
 
-// Carrega configurações adicionais da meta tag se disponível
+// Carrega configurações adicionais da meta tag se disponível, mas apenas em ambiente de desenvolvimento
 const configMeta = document.querySelector('meta[name="app-config"]');
-if (configMeta) {
+if (configMeta && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     try {
         Object.assign(FRONTEND_CONFIG, JSON.parse(configMeta.content));
     } catch (e) {
