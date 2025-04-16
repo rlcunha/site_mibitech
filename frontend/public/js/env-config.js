@@ -11,7 +11,7 @@ window.ENV = window.ENV || {};
 // Este arquivo será modificado pelo servidor para injetar as variáveis de ambiente reais
 window.ENV = {
   // URL base da API
-  API_BASE_URL: window.ENV.API_BASE_URL || 'https://apirest.mibitech.com.br',
+  API_BASE_URL: window.ENV.API_BASE_URL || 'http://apirest.mibitech.com.br:8000',
   
   // Ambiente de execução (development, production, test)
   NODE_ENV: window.ENV.NODE_ENV || 'development',
