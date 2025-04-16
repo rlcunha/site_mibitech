@@ -39,7 +39,7 @@ const MIME_TYPES = {
 };
 
 // Proxy configuration
-const API_BASE_URL = process.env.API_BASE_URL || (process.env.NODE_ENV === 'production' ? 'http://apirest.mibitech.com.br' : 'http://localhost:8000');
+const API_BASE_URL = process.env.API_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://apirest.mibitech.com.br' : 'http://localhost:8000');
 
 // Função para injetar variáveis de ambiente no frontend
 const injectEnvVariables = (content) => {
