@@ -29,13 +29,9 @@ async function initializeApp() {
     // Application initialized
     
     try {
-        // Verify containers exist before initialization (using IDs)
+        // Get containers (if they exist)
         const contactContainer = document.getElementById('contactInfoContainer');
         const socialContainer = document.getElementById('socialMediaContainer');
-        
-        if (!contactContainer || !socialContainer) {
-            throw new Error('Required containers not found');
-        }
         
         // Initialize controllers
         // Creating controller instances
@@ -51,16 +47,17 @@ async function initializeApp() {
         initializeMobileMenu();
         
         // Initialize controllers with proper selectors
-        // Social media container initialized
-        if (typeof companyController.init === 'function') {
+        // Initialize company controller if social container exists
+        if (socialContainer && typeof companyController.init === 'function') {
             companyController.init({
                 socialMediaContainer: '#socialMediaContainer',
                 footerSocialContainer: '#footerSocialContainer'
             });
         }
         
-        console.log('Contato container inicializado');
-        if (typeof contactController.init === 'function') {
+        // Initialize contact controller if contact container exists
+        if (contactContainer && typeof contactController.init === 'function') {
+            console.log('Contato container inicializado');
             contactController.init({
                 contactContainer: '#contactInfoContainer',
                 messageForm: '#contactForm',

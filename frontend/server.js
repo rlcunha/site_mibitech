@@ -41,6 +41,23 @@ const MIME_TYPES = {
 // Proxy configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000';
 
+// Função para injetar variáveis de ambiente no frontend
+const injectEnvVariables = (content) => {
+    // Obtém todas as variáveis de ambiente do processo Node.js
+    const envVars = {
+        API_BASE_URL,
+        NODE_ENV: process.env.NODE_ENV || 'development',
+        VERSION: process.env.VERSION || '1.0.0'
+        // Adicione outras variáveis de ambiente aqui conforme necessário
+    };
+    
+    // Substitui a definição do objeto window.ENV no arquivo env-config.js
+    return content.replace(
+        /window\.ENV = \{[\s\S]*?\};/,
+        `window.ENV = ${JSON.stringify(envVars, null, 2)};`
+    );
+};
+
 // Create the HTTP server
 const server = http.createServer((req, res) => {
     // Health check endpoint
@@ -113,8 +130,15 @@ const server = http.createServer((req, res) => {
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
+            // Injetar variáveis de ambiente no arquivo env-config.js
+            if (req.url === '/js/env-config.js' || req.url === '/public/js/env-config.js') {
+                const modifiedContent = injectEnvVariables(content.toString('utf-8'));
+                res.writeHead(200, { 'Content-Type': contentType });
+                res.end(modifiedContent, 'utf-8');
+            } else {
+                res.writeHead(200, { 'Content-Type': contentType });
+                res.end(content, 'utf-8');
+            }
         }
     });
 });
