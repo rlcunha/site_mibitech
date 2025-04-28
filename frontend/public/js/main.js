@@ -17,11 +17,22 @@ try {
     ContactController = class {};
 }
 
+// Garantir que a aplicação seja inicializada apenas uma vez quando o DOM estiver pronto
+let appInitialized = false;
+
 // Check if DOM is already loaded
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!appInitialized) {
+            appInitialized = true;
+            initializeApp();
+        }
+    });
 } else {
-    initializeApp();
+    if (!appInitialized) {
+        appInitialized = true;
+        initializeApp();
+    }
 }
 
 // Handle both DOMContentLoaded and already loaded cases
@@ -80,12 +91,7 @@ async function initializeApp() {
     }
 }
 
-// Check if DOM is already loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-    initializeApp();
-}
+// Removida a duplicação da inicialização
 
 /**
  * Navigation functionality
