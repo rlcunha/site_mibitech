@@ -11,10 +11,10 @@ const FRONTEND_CONFIG = {
      * URL base da API
      * @type {string}
      */
-    API_BASE_URL: window.ENV?.API_BASE_URL 
+    API_BASE_URL: window.ENV?.API_BASE_URL
         || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8000'
-            : 'http://server.mibitech.com.br:8000'),
+            : 'https://apirest.mibitech.com.br'),
             
     /**
      * Ambiente de execução
