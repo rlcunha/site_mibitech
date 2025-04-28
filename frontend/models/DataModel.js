@@ -3,14 +3,7 @@
  * Base model class for handling data operations
  */
 
-let config;
-try {
-    // Try to load test config first
-    config = (await import('../tests/config.test.js')).default;
-} catch {
-    // Fallback to regular config
-    config = (await import('../public/js/config.js')).default;
-}
+import config from '../public/js/config.js';
 
 class DataModel {
     constructor() {
