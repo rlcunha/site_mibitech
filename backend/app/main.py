@@ -137,7 +137,8 @@ app.add_middleware(
     allow_origins=[
         "https://appteste.mibitech.com.br",
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "http://apirest.mibitech.com.br:8000"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
