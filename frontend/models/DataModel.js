@@ -27,12 +27,8 @@ class DataModel {
     buildApiUrl(endpoint) {
         // Remove leading/trailing slashes for consistency
         const cleanEndpoint = endpoint.replace(/^\/|\/$/g, '');
-        // Garantir que a URL da API sempre tenha a porta 8000
-        let baseUrl = config.API_BASE_URL;
-        if (baseUrl.includes('apirest.mibitech.com.br')) {
-            // Usar HTTP pois o servidor não suporta HTTPS na porta 8000
-            baseUrl = 'http://apirest.mibitech.com.br:8000';
-        }
+        // Usar a URL base da API definida na configuração
+        const baseUrl = config.API_BASE_URL;
         return `${baseUrl}/${cleanEndpoint}`;
     }
 
