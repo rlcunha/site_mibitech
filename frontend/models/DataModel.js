@@ -27,20 +27,13 @@ class DataModel {
     buildApiUrl(endpoint) {
         // Remove leading/trailing slashes for consistency
         const cleanEndpoint = endpoint.replace(/^\/|\/$/g, '');
-        
-        // Garantir que a URL da API sempre tenha a porta 8000 e use HTTP
+        // Garantir que a URL da API sempre tenha a porta 8000
         let baseUrl = config.API_BASE_URL;
-        
-        // Forçar HTTP para apirest.mibitech.com.br na porta 8000
         if (baseUrl.includes('apirest.mibitech.com.br')) {
             // Usar HTTP pois o servidor não suporta HTTPS na porta 8000
             baseUrl = 'http://apirest.mibitech.com.br:8000';
-            console.log('Usando HTTP para apirest.mibitech.com.br:8000');
         }
-        
-        const fullUrl = `${baseUrl}/${cleanEndpoint}`;
-        console.log(`URL completa da API: ${fullUrl}`);
-        return fullUrl;
+        return `${baseUrl}/${cleanEndpoint}`;
     }
 
     /**
@@ -112,70 +105,42 @@ class DataModel {
     }
 
     /**
-     * Post data to an API endpoint with retry mechanism
+     * Post data to an API endpoint
      * @param {string} endpoint - The API endpoint path (e.g. '/companies')
      * @param {Object} data - The data to post
      * @param {Object} options - Additional fetch options
-     * @param {number} retries - Number of retries (default: 3)
      * @returns {Promise} - Promise resolving to the response data
      */
-    async postData(endpoint, data, options = {}, retries = 3) {
+    async postData(endpoint, data, options = {}) {
         this.isLoading = true;
         this.error = null;
 
         const url = this.buildApiUrl(endpoint);
 
-        // Implementação de retry com backoff exponencial
-        for (let attempt = 0; attempt <= retries; attempt++) {
-            try {
-                console.log(`Posting data to: ${url} (attempt ${attempt + 1}/${retries + 1})`);
-                
-                const fetchOptions = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Origin': window.location.origin,
-                        ...options.headers
-                    },
-                    body: JSON.stringify(data),
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    credentials: 'same-origin',
-                    ...options
-                };
-                
-                console.log(`Tentando enviar dados para: ${url} com opções:`, fetchOptions);
-                
-                const response = await fetch(url, fetchOptions);
-                
-                if (!response.ok) {
-                    console.warn(`HTTP error! Status: ${response.status}, Statustext: ${response.statusText}`);
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const responseData = await response.json();
-                return responseData;
-            } catch (error) {
-                this.error = error.message;
-                console.error(`Tentativa ${attempt + 1}/${retries + 1} falhou:`, error);
-                
-                // Se for o último retry, lança o erro
-                if (attempt === retries) {
-                    console.error('Todas as tentativas falharam ao enviar dados para:', url);
-                    console.error('Detalhes do erro:', error);
-                    console.error('Verifique se o servidor está rodando e se as configurações CORS estão corretas');
-                    throw error;
-                }
-                
-                // Espera antes de tentar novamente (backoff exponencial)
-                const waitTime = Math.min(1000 * Math.pow(2, attempt), 10000);
-                console.log(`Aguardando ${waitTime}ms antes da próxima tentativa...`);
-                await new Promise(resolve => setTimeout(resolve, waitTime));
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                body: JSON.stringify(data),
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            
+            const responseData = await response.json();
+            return responseData;
+        } catch (error) {
+            this.error = error.message;
+            console.error('Error posting data:', error);
+            throw error;
+        } finally {
+            this.isLoading = false;
         }
-        
-        this.isLoading = false;
     }
 }
 

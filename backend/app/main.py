@@ -134,10 +134,20 @@ from .middleware import InvalidRequestMiddleware
 # Configuração CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://appteste.mibitech.com.br"],
+    allow_origins=[
+        "https://appteste.mibitech.com.br",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Accept"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=[
+        "Content-Type",
+        "Accept",
+        "Authorization",
+        "X-Requested-With",
+        "Access-Control-Allow-Origin"
+    ],
 )
 
 # Adiciona middleware para capturar requisições inválidas
