@@ -14,7 +14,7 @@ const FRONTEND_CONFIG = {
     API_BASE_URL: window.ENV?.API_BASE_URL
         || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8000'
-            : 'http://apirest.mibitech.com.br:8000'), // Usando HTTP pois o servidor não suporta HTTPS na porta 8000
+            : 'https://apirest.mibitech.com.br'), // Usando HTTPS em produção através do Traefik
             
     /**
      * Ambiente de execução
