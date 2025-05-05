@@ -27,7 +27,7 @@ services:
         - "traefik.http.routers.backend.middlewares=cors-headers@docker"
         # Removendo o middleware que remove o prefixo /api, pois a aplicação espera esse prefixo
         # - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
-        - "traefik.http.routers.backend-api.rule=Host(`apirest.mibitech.com.br`) && PathPrefix(`/api`)"
+        - "traefik.http.routers.backend-api.rule=Host(`apirest.mibitech.com.br`) && PathPrefix(`/api/v1`)"
         - "traefik.http.services.backend-api.loadbalancer.server.port=8000"
         - "traefik.http.routers.backend-api.entrypoints=web,websecure"
         - "traefik.http.routers.backend-api.tls.certresolver=letsencryptresolver"
